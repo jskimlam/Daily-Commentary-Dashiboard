@@ -644,19 +644,17 @@ function autoPct(p){
   const ch=parseFloat(document.getElementById(`f-change-${p}`)?.value);
   if(pr&&!isNaN(ch)&&pr-ch>0)document.getElementById(`f-pct-${p}`).value=(ch/(pr-ch)*100).toFixed(2);
 }
-// 수정된 안전한 toB64 함수
-function toB64(obj) {
-  const str = JSON.stringify(obj);
-  // 한글 및 특수문자를 위해 base64 전송 전 인코딩 처리
-  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-    return String.fromCharCode('0x' + p1);
-  }));
-}
-async function gasGet(params){
-  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  const res=await fetch(GAS+'?'+qs);
+// 1. POST 전송용 공통 함수 (데이터 길이 제한 해결)
+async function gasPost(payload) {
+  const res = await fetch(GAS, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
   return res.json();
 }
+
+// 2. 수정된 저장 함수 (POST 방식)
 async function doSave(){
   const p=activeTab,g=id=>document.getElementById(id);
   const price=parseFloat(g(`f-price-${p}`).value),pct=parseFloat(g(`f-pct-${p}`).value),dr=g(`f-date-${p}`).value;
@@ -665,11 +663,10 @@ async function doSave(){
     direction:g(`f-dir-${p}`).value,commentary:g(`f-co-${p}`).value.trim(),
     factors:g(`f-fa-${p}`).value.trim(),outlook:g(`f-ou-${p}`).value.trim()};
   const isEdit=editMode.sheet===p;
-  const action=isEdit?'edit':'save';
-  const payload={sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
+  const payload={action:isEdit?'edit':'save',sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
   const btn=document.querySelector('.m-ftr .btn-primary');btn.textContent='저장 중...';btn.disabled=true;
   try{
-    const r=await gasGet({action,p:toB64(payload)});
+    const r=await gasPost(payload);
     if(r.success){
       toast('✅ '+r.message,'ok');tabDone[p]=true;updDots();curDate=data.date;
       await loadData();
@@ -678,7 +675,15 @@ async function doSave(){
   }catch(e){toast('❌ 오류: '+e.message,'err');}
   finally{btn.textContent='▶ 저장';btn.disabled=false;}
 }
+
+// 3. 수정된 삭제 함수 (POST 방식)
 async function delEntry(prod,date){
+  if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
+  try{
+    const r=await gasPost({action:'delete',sheet:prod,rowKey:{date}});
+    if(r.success){toast('🗑 '+r.message,'ok');await loadData();}else toast('❌ '+r.message,'err');
+  }catch(e){toast('❌ 오류: '+e.message,'err');}
+}
   if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
   try{
     const payload={sheet:prod,rowKey:{date}};
