@@ -281,10 +281,13 @@ const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
 const LABELS={WTI:'WTI 원유',Styrene:'스티렌 모노머',Benzene:'벤젠',Butadiene:'부타디엔'};
 let allData={WTI:[],Styrene:[],Benzene:[],Butadiene:[]};
 let allDates=[],curDate='',editMode={},activeTab='WTI',tabDone={},sparkData={};
+
 function tick(){const k=new Date(Date.now()+9*3600000);document.getElementById('clock').textContent=k.toISOString().slice(0,10)+' '+k.toISOString().slice(11,19)+' KST';}
 tick();setInterval(tick,1000);
+
 function fmtDate(r){if(!r)return'';const s=String(r).trim();const m=s.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);if(m)return`${m[1]}.${m[2].padStart(2,'0')}.${m[3].padStart(2,'0')}`;return s.slice(0,10).replace(/-/g,'.');}
 function dow(d){const[y,mo,day]=d.split('.');return['일','월','화','수','목','금','토'][new Date(y,mo-1,day).getDay()];}
+
 async function loadData(){
   document.getElementById('grid').innerHTML='<div class="spinner-wrap"><div class="spinner"></div><div class="loading-txt">데이터 불러오는 중...</div></div>';
   try{
@@ -300,6 +303,7 @@ async function loadData(){
     else document.getElementById('grid').innerHTML='<div class="empty-state">데이터가 없습니다. NEW ENTRY로 추가하세요.</div>';
   }catch(e){toast('로드 실패: '+e.message,'err');document.getElementById('grid').innerHTML='<div class="empty-state">데이터 로드 실패</div>';}
 }
+
 function buildArc(){
   const el=document.getElementById('arc-list');
   if(!allDates.length){el.innerHTML='<div style="padding:14px;font-family:var(--mono);font-size:10px;color:var(--g4);text-align:center;">데이터 없음</div>';return;}
@@ -313,9 +317,11 @@ function buildArc(){
     return`<div class="arc-item${d===curDate?' active':''}" onclick="selDate('${d}')"><span>${d}</span><span class="arc-dots">${dots}</span></div>`;
   }).join('');
 }
+
 function selDate(d){curDate=d;buildArc();renderDate(d);}
 document.getElementById('btn-prev').onclick=()=>{const i=allDates.indexOf(curDate);if(i<allDates.length-1)selDate(allDates[i+1]);};
 document.getElementById('btn-next').onclick=()=>{const i=allDates.indexOf(curDate);if(i>0)selDate(allDates[i-1]);};
+
 function renderDate(date){
   document.getElementById('hdr-date-lbl').textContent=date||'—';
   document.getElementById('main-date').textContent=date||'—';
@@ -324,6 +330,7 @@ function renderDate(date){
   PRODS.forEach(p=>drawSpark(p,sparkData[p]||[]));
   buildWkTable();
 }
+
 function renderCard(prod,entry,date){
   const cls=PCLS[prod];const unit=UNITS[prod];
   if(!entry)return`<div class="p-card"><div class="card-bar ${cls}"></div><div class="card-hdr"><div><div class="card-prod ${cls}">${prod}</div><div class="card-unit">${unit}</div></div></div><div class="no-data"><div class="no-data-icon">—</div><div class="no-data-txt">데이터 없음</div><button class="no-data-btn" onclick="openModal('${prod}','${date}')">+ 입력</button></div></div>`;
@@ -354,11 +361,13 @@ function renderCard(prod,entry,date){
     <div class="card-foot"><button class="cp-btn" onclick="cpCard('${prod}')">Copy</button></div>
   </div>`;
 }
+
 function getStreak(prod,date){
   const list=(allData[prod]||[]).filter(e=>e.date<=date).sort((a,b)=>b.date.localeCompare(a.date));
   if(!list.length)return 0;const dir=list[0].direction;let c=0;
   for(const e of list){if(e.direction===dir)c++;else break;}return c;
 }
+
 function drawSpark(prod,data){
   const cv=document.getElementById('spark-'+prod);
   if(!cv||!data||data.length<2)return;
@@ -385,6 +394,7 @@ function drawSpark(prod,data){
   const lx=pd.l+(prices.length-1)*xS,ly=yV(prices[prices.length-1]);
   ctx.beginPath();ctx.arc(lx,ly,2.5,0,Math.PI*2);ctx.fillStyle=col[dir];ctx.fill();
 }
+
 function buildWsSidebar(){
   const el=document.getElementById('ws-wrap'),r5=allDates.slice(0,5);
   el.innerHTML=PRODS.map(p=>{
@@ -397,6 +407,7 @@ function buildWsSidebar(){
     return`<div class="ws-row"><span class="ws-prod">${p}</span><span class="ws-trend">${pips}</span></div>`;
   }).join('');
 }
+
 function buildWkTable(){
   const r7=allDates.slice(0,7).reverse();
   document.getElementById('wk-range').textContent=r7.length?`(${r7[0]} ~ ${r7[r7.length-1]})`:'';
@@ -412,6 +423,7 @@ function buildWkTable(){
     return`<tr><td>${p}</td>${cells}</tr>`;
   }).join('');
 }
+
 function buildPanels(){
   document.getElementById('tab-panels').innerHTML=PRODS.map(p=>`
     <div class="tab-panel${p==='WTI'?' active':''}" id="panel-${p}">
@@ -439,6 +451,7 @@ function buildPanels(){
       </div>
     </div>`).join('');
 }
+
 function openModal(prod,date,entry){
   buildPanels();tabDone={};editMode={};
   document.getElementById('modal-title').textContent=entry?'EDIT ENTRY':'NEW ENTRY';
@@ -448,7 +461,9 @@ function openModal(prod,date,entry){
   switchTab(prod||'WTI');
   document.getElementById('overlay').classList.add('open');
 }
+
 function closeModal(){document.getElementById('overlay').classList.remove('open');editMode={};tabDone={};}
+
 function switchTab(p){
   activeTab=p;
   document.querySelectorAll('.tab-panel').forEach(e=>e.classList.remove('active'));
@@ -456,14 +471,16 @@ function switchTab(p){
   document.getElementById('panel-'+p)?.classList.add('active');
   document.querySelector(`[data-tab="${p}"]`)?.classList.add('active');
 }
+
 function updDots(){PRODS.forEach(p=>{document.querySelector(`[data-tab="${p}"]`)?.classList.toggle('done',!!tabDone[p]);});}
+
 function fillF(p,e){
   const g=id=>document.getElementById(id);
   g(`f-price-${p}`).value=e.price||'';g(`f-change-${p}`).value=e.change??'';g(`f-pct-${p}`).value=e.changePct||'';
   g(`f-date-${p}`).value=(e.date||'').replace(/\./g,'-');g(`f-dir-${p}`).value=e.direction||'보합';
   g(`f-co-${p}`).value=e.commentary||'';g(`f-fa-${p}`).value=e.factors||'';g(`f-ou-${p}`).value=e.outlook||'';
 }
-// ── WTI: 일반 뉴스 기사 파싱 ──
+
 function parseWTI(txt){
   const f={};let m;
   m=txt.match(/(?:하락한|오른|밀린|내린|상승한)\s*배럴당\s*([\d.]+)달러/);if(m)f.price=parseFloat(m[1]);
@@ -474,7 +491,6 @@ function parseWTI(txt){
   if(!f.change){m=txt.match(/([\d.]+)달러\(([\d.]+)%\)\s*(?:상승|오른|올라)/);if(m){f.change=parseFloat(m[1]);f.pct=parseFloat(m[2]);}}
   if(!f.pct){m=txt.match(/([\d.]+)%\s*(하락|상승)/);if(m)f.pct=m[2]==='하락'?-parseFloat(m[1]):parseFloat(m[1]);}
   if(!f.change&&f.price&&f.pct){const prev=f.price/(1+f.pct/100);f.change=parseFloat((f.price-prev).toFixed(2));}
-  // 날짜 파싱
   let aY=null,aMo=null;
   const ymM=txt.match(/(\d{4})[년.\-\/]\s*(\d{1,2})[월.\-\/]/);
   if(ymM){aY=parseInt(ymM[1]);aMo=parseInt(ymM[2]);}
@@ -487,44 +503,34 @@ function parseWTI(txt){
       if(day>mx){day=1;mo=mo%12+1;if(mo===1)yr++;}
       f.dateStr=`${yr}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     }else{
-      const fdM=txt.match(/(\d{4})[年년.\-\/]\s*(\d{1,2})[月월.\-\/]\s*(\d{1,2})/);
+      const fdM=txt.match(/(\d{4})[年년.\-\/]\s*(\d{1,2})[월.\-\/]\s*(\d{1,2})/);
       if(fdM)f.dateStr=`${fdM[1]}-${fdM[2].padStart(2,'0')}-${fdM[3].padStart(2,'0')}`;
     }
   }
-  // WTI 코멘터리: 자동생성
   if(f.price&&f.pct!=null){
     const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${f.change.toFixed(2)} USD, `:'';
     const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
     f.commentary=`WTI는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 배럴당 $${f.price.toFixed(2)}에 ${dir} 마감했다.`;
   }
-  // WTI 변동요인/전망: 뉴스 기사 추출
   const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
   f.factors=extractFactors(txt,dir);
   f.outlook=extractOutlook(txt);
   return f;
 }
 
-// ── SM/BZ/BD: 구조화된 브리핑 양식 파싱 ──
 function parseBriefing(txt, prod){
   const f={};let m;
-
-  // 날짜: 브리핑 첫 줄 (2026-02-13)
   m=txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
   if(m)f.dateStr=`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
-
-  // 가격 추출: SM/BD → CFR China, BZ → FOB Korea
   if(prod==='Benzene'){
-    // FOB Korea: "$XXX/mt" 또는 "FOB Korea: $XXX/mt"
     m=txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,]+(?:\.\d+)?)\/mt/i);
     if(m)f.price=parseFloat(m[1].replace(/,/g,''));
-    // 변동: FOB Korea 같은 줄에서 ▼/▲ $X/mt
     if(m){
       const line=txt.match(/FOB\s*Korea[^\n]*/i)?.[0]||'';
       const cm=line.match(/([▼▲])\s*\$([\d.]+)\/mt/);
       if(cm){f.change=cm[1]==='▼'?-parseFloat(cm[2]):parseFloat(cm[2]);}
     }
   } else {
-    // SM/BD → CFR China
     m=txt.match(/CFR\s*China[^\n]*?\$\s*([\d,]+(?:\.\d+)?)\/mt/i);
     if(m)f.price=parseFloat(m[1].replace(/,/g,''));
     if(m){
@@ -533,55 +539,37 @@ function parseBriefing(txt, prod){
       if(cm){f.change=cm[1]==='▼'?-parseFloat(cm[2]):parseFloat(cm[2]);}
     }
   }
-
-  // 변동률 계산 (브리핑엔 % 없으므로 직접 계산)
   if(f.price&&f.change!=null){
     const prev=f.price-f.change;
     f.pct=prev>0?parseFloat((f.change/prev*100).toFixed(2)):0;
   }
-
-  // 방향 판단
   const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
-
-  // 코멘터리: 섹션 3) 아래 * 첫 줄
   const sec3=txt.match(/3\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|$)/);
   if(sec3){
     const bullets=sec3[1].match(/\*\s*(.+)/g);
-    if(bullets&&bullets.length>0)
-      f.commentary=bullets[0].replace(/^\*\s*/,'').trim();
+    if(bullets&&bullets.length>0) f.commentary=bullets[0].replace(/^\*\s*/,'').trim();
   }
-  // 코멘터리 없으면 자동 생성
   if(!f.commentary&&f.price&&f.pct!=null){
     const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${Math.abs(f.change).toFixed(0)} USD, `:'';
     f.commentary=`${prod}(CFR China)는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 톤당 $${f.price.toFixed(0)}에 ${dir} 마감했다.`;
   }
-
-  // 변동요인: 섹션 4) 아래 * 항목들
   const sec4=txt.match(/4\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|$)/);
   if(sec4){
     const bullets=sec4[1].match(/\*\s*(.+)/g)||[];
     f.factors=bullets.map(b=>b.replace(/^\*\s*/,'').trim()).filter(Boolean).join(' / ');
   }
-
-  // 결론전망: 섹션 5) 아래 * 첫 줄
   const sec5=txt.match(/5\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|\(참고|$)/);
   if(sec5){
     const bullets=sec5[1].match(/\*\s*(.+)/g);
-    if(bullets&&bullets.length>0)
-      f.outlook=bullets[0].replace(/^\*\s*/,'').trim();
+    if(bullets&&bullets.length>0) f.outlook=bullets[0].replace(/^\*\s*/,'').trim();
   }
-
   return f;
 }
 
 function doParse(){
   const p=activeTab,txt=(document.getElementById('ta-'+p)||{}).value?.trim();
   if(!txt){showSt(p,'warn','텍스트 없음 — 수동 입력 모드');return;}
-
-  // 제품별 파싱 분기
   const f=p==='WTI'?parseWTI(txt):parseBriefing(txt,p);
-
-  // 공통 필드 적용
   if(f.dateStr)document.getElementById(`f-date-${p}`).value=f.dateStr;
   const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
   document.getElementById(`f-dir-${p}`).value=dir;
@@ -591,60 +579,35 @@ function doParse(){
   if(f.commentary)document.getElementById(`f-co-${p}`).value=f.commentary;
   if(f.factors)document.getElementById(`f-fa-${p}`).value=f.factors;
   if(f.outlook)document.getElementById(`f-ou-${p}`).value=f.outlook;
-
   tabDone[p]=true;updDots();
   const ok=f.price&&f.pct!=null;
-  showSt(p,ok?'ok':'warn',ok
-    ?`✓ ${p} $${(f.price||0).toFixed(2)} (${(f.pct||0)>=0?'+':''}${(f.pct||0).toFixed(2)}%) ${dir}`
-    :'수치 일부 파싱 실패 — 수동 확인');
+  showSt(p,ok?'ok':'warn',ok ?`✓ ${p} $${(f.price||0).toFixed(2)} (${(f.pct||0)>=0?'+':''}${(f.pct||0).toFixed(2)}%) ${dir}` :'수치 일부 파싱 실패 — 수동 확인');
 }
-function splitSents(txt){
-  return txt.split(/(?<=[다습니다까요었다]\.)\s+|(?<=다\.\s)|(?<=\n)/)
-    .map(s=>s.trim()).filter(s=>s.length>10&&s.length<250);
-}
-function trimSent(s,max=120){
-  if(!s)return'';
-  s=s.replace(/^[^가-힣a-zA-Z$\d"]+/,'').trim();
-  if(s.length<=max)return s;
-  const cut=s.lastIndexOf(' ',max);
-  return(cut>50?s.slice(0,cut):s.slice(0,max))+'…';
-}
+
+function splitSents(txt){return txt.split(/(?<=[다습니다까요었다]\.)\s+|(?<=다\.\s)|(?<=\n)/).map(s=>s.trim()).filter(s=>s.length>10&&s.length<250);}
+function trimSent(s,max=120){if(!s)return'';s=s.replace(/^[^가-힣a-zA-Z$\d"]+/,'').trim();if(s.length<=max)return s;const cut=s.lastIndexOf(' ',max);return(cut>50?s.slice(0,cut):s.slice(0,max))+'…';}
+
 function extractFactors(txt,dir){
   const ss=splitSents(txt);
-  // 하락요인: OPEC증산, 재고증가, 이란합의, 달러강세, 경기침체 등
   const bearKw=['증산','재고 증가','이란','합의','달러 강세','경기침체','수요 감소','공급 과잉'];
-  // 상승요인: 감산, 재고감소, 중동긴장, 달러약세, 호르무즈 등
   const bullKw=['감산','재고 감소','중동','항모','호르무즈','달러 약세','저가 매수','수요 증가'];
   const kws=dir==='하락'?bearKw:dir==='상승'?bullKw:[...bearKw,...bullKw];
   const found=[];
-  for(const kw of kws){
-    const s=ss.find(x=>x.includes(kw)&&!found.includes(x));
-    if(s&&found.length<2)found.push(trimSent(s,100));
-  }
+  for(const kw of kws){const s=ss.find(x=>x.includes(kw)&&!found.includes(x));if(s&&found.length<2)found.push(trimSent(s,100));}
   return found.join(' / ');
 }
+
 function extractOutlook(txt){
   const ss=splitSents(txt);
-  const pp=[
-    /전망이다/,/예상된다/,/보일 것/,/것으로 보인다/,/것으로 예상/,
-    /할 것이라/,/될 것으로/,/이어질 것/,/지속될/,/주목된다/,
-    /향후/,/앞으로/
-  ];
-  for(const p of pp){
-    const s=ss.find(x=>p.test(x));
-    if(s)return trimSent(s,120);
-  }
-  // 마지막 문장 fallback
+  const pp=[/전망이다/,/예상된다/,/보일 것/,/것으로 보인다/,/것으로 예상/,/할 것이라/,/될 것으로/,/이어질 것/,/지속될/,/주목된다/,/향후/,/앞으로/];
+  for(const p of pp){const s=ss.find(x=>p.test(x));if(s)return trimSent(s,120);}
   if(ss.length>0)return trimSent(ss[ss.length-1],120);
   return null;
 }
+
 function showSt(p,t,m){const el=document.getElementById('ps-'+p);if(!el)return;el.style.display='block';el.className=`parse-status ${t}`;el.textContent=m;}
-function autoPct(p){
-  const pr=parseFloat(document.getElementById(`f-price-${p}`)?.value);
-  const ch=parseFloat(document.getElementById(`f-change-${p}`)?.value);
-  if(pr&&!isNaN(ch)&&pr-ch>0)document.getElementById(`f-pct-${p}`).value=(ch/(pr-ch)*100).toFixed(2);
-}
-// 1. POST 전송용 공통 함수 (데이터 길이 제한 해결)
+function autoPct(p){const pr=parseFloat(document.getElementById(`f-price-${p}`)?.value);const ch=parseFloat(document.getElementById(`f-change-${p}`)?.value);if(pr&&!isNaN(ch)&&pr-ch>0)document.getElementById(`f-pct-${p}`).value=(ch/(pr-ch)*100).toFixed(2);}
+
 async function gasPost(payload) {
   const res = await fetch(GAS, {
     method: 'POST',
@@ -654,19 +617,16 @@ async function gasPost(payload) {
   return res.json();
 }
 
-// 2. 수정된 저장 함수 (POST 방식)
 async function doSave(){
   const p=activeTab,g=id=>document.getElementById(id);
   const price=parseFloat(g(`f-price-${p}`).value),pct=parseFloat(g(`f-pct-${p}`).value),dr=g(`f-date-${p}`).value;
   if(!dr||isNaN(price)||isNaN(pct)){showSt(p,'err','기준일, 가격, 변동률은 필수입니다.');return;}
-  const data={date:fmtDate(dr),price,change:parseFloat(g(`f-change-${p}`).value)||null,changePct:pct,
-    direction:g(`f-dir-${p}`).value,commentary:g(`f-co-${p}`).value.trim(),
-    factors:g(`f-fa-${p}`).value.trim(),outlook:g(`f-ou-${p}`).value.trim()};
+  const data={date:fmtDate(dr),price,change:parseFloat(g(`f-change-${p}`).value)||null,changePct:pct, direction:g(`f-dir-${p}`).value,commentary:g(`f-co-${p}`).value.trim(), factors:g(`f-fa-${p}`).value.trim(),outlook:g(`f-ou-${p}`).value.trim()};
   const isEdit=editMode.sheet===p;
   const payload={action:isEdit?'edit':'save',sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
   const btn=document.querySelector('.m-ftr .btn-primary');btn.textContent='저장 중...';btn.disabled=true;
   try{
-    const r=await gasPost(payload);
+    const r = await gasPost(payload);
     if(r.success){
       toast('✅ '+r.message,'ok');tabDone[p]=true;updDots();curDate=data.date;
       await loadData();
@@ -676,21 +636,14 @@ async function doSave(){
   finally{btn.textContent='▶ 저장';btn.disabled=false;}
 }
 
-// 3. 수정된 삭제 함수 (POST 방식)
 async function delEntry(prod,date){
   if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
   try{
-    const r=await gasPost({action:'delete',sheet:prod,rowKey:{date}});
+    const r = await gasPost({action:'delete',sheet:prod,rowKey:{date}});
     if(r.success){toast('🗑 '+r.message,'ok');await loadData();}else toast('❌ '+r.message,'err');
   }catch(e){toast('❌ 오류: '+e.message,'err');}
 }
-  if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
-  try{
-    const payload={sheet:prod,rowKey:{date}};
-    const r=await gasGet({action:'delete',p:toB64(payload)});
-    if(r.success){toast('🗑 '+r.message,'ok');await loadData();}else toast('❌ '+r.message,'err');
-  }catch(e){toast('❌ 오류: '+e.message,'err');}
-}
+
 function cpCard(prod){
   const e=(allData[prod]||[]).find(x=>x.date===curDate);if(!e)return;
   const dir=e.direction==='상승'?'▲':e.direction==='하락'?'▼':'—';
@@ -698,6 +651,7 @@ function cpCard(prod){
   const txt=[`[${prod}] ${curDate}`,`${dir} $${e.price.toFixed(2)} (${s}${e.changePct.toFixed(2)}%) ${e.direction}`,e.commentary||'',e.factors?'▸ '+e.factors:'',e.outlook?'▸ '+e.outlook:''].filter(Boolean).join('\n');
   navigator.clipboard.writeText(txt).then(()=>toast('✅ 클립보드 복사 완료','ok'));
 }
+
 function copyMsg(){
   const lines=[`📊 Daily Chemical Brief — ${curDate}\n`];
   PRODS.forEach(p=>{
@@ -709,6 +663,7 @@ function copyMsg(){
   });
   navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('✅ 메신저 포맷 복사 완료','ok'));
 }
+
 async function dlImage(){
   const el=document.getElementById('grid');if(!el)return;
   toast('이미지 생성 중...','inf');
@@ -718,6 +673,7 @@ async function dlImage(){
     toast('✅ 이미지 저장 완료','ok');
   }catch(e){toast('❌ 이미지 오류: '+e.message,'err');}
 }
+
 function dlPDF(){
   toast('PDF 생성 중...','inf');
   try{
@@ -746,7 +702,9 @@ function dlPDF(){
     doc.save(`DailyBrief_${curDate}.pdf`);toast('✅ PDF 저장 완료','ok');
   }catch(e){toast('❌ PDF 오류: '+e.message,'err');}
 }
+
 function toast(msg,type='inf',ms=3000){const t=document.getElementById('toast');t.textContent=msg;t.className=`show ${type}`;clearTimeout(t._t);t._t=setTimeout(()=>t.className='',ms);}
+
 loadData();
 </script>
 </body>
