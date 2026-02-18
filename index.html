@@ -25,36 +25,24 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;flex-shrink:0;}
 
-/* LAM 로고: 주황색 박스 + 검은색 글자 */
 .hdr-mark{width:50px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#000 !important;border:2px solid #000;}
-
 .hdr-title{font-family:var(--disp);font-size:18px;font-weight:900;color:#000;display:flex;align-items:baseline;}
 .hdr-title span { color: var(--lotte); }
 
-/* 저작권 문구: 검은색 + 아주 굵게 */
 .copyright-text { 
-  font-family: var(--sans); 
-  font-size: 13px; 
-  font-weight: 800; 
-  color: #000 !important; 
-  margin-left: 14px; 
-  border-left: 2px solid #000; 
-  padding-left: 14px;
-  white-space: nowrap;
+  font-family: var(--sans); font-size: 13px; font-weight: 800; color: #000 !important; 
+  margin-left: 14px; border-left: 2px solid #000; padding-left: 14px; white-space: nowrap;
 }
 
 .hdr-center{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;}
 .hdr-date-nav{display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:6px 12px;border:1px solid var(--bd);}
 .hdr-date-lbl{font-family:var(--mono);font-size:16px;font-weight:700;min-width:105px;text-align:center;}
-
 .hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 
-/* 버튼 공통 */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;border:1px solid transparent;white-space:nowrap;}
 .btn-primary{background:var(--lotte);color:#fff;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
 
-/* 메인 레이아웃 */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
 .sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
 .s-card{background:var(--white);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh);}
@@ -69,7 +57,6 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .card-hdr{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;}
 .card-prod{font-family:var(--disp);font-size:22px;font-weight:900;}
 
-/* 가격 및 판정 */
 .card-price{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
 .p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
@@ -77,36 +64,19 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .dir-badge{display:inline-block;padding:6px 16px;border-radius:30px;font-size:15px;font-weight:900;border:2px solid black;margin-bottom:15px;margin-left:18px;}
 .dir-badge.up{background:var(--up);color:white;}.dir-badge.dn{background:var(--dn);color:white;}.dir-badge.flt{background:var(--g3);color:white;}
 
-/* 노란 박스 & 굵은 코멘터리 */
 .section-label-box { display: inline-block; background-color: var(--highlight-bg); border: 2px solid #000; padding: 4px 12px; margin: 15px 18px 8px; border-radius: 4px; }
 .section-label-text { font-family: var(--mono); font-size: 13px; font-weight: 900; color: #000; text-transform: uppercase; }
 .section-body-text { padding: 0 18px 18px; font-size: 16px; line-height: 1.65; color: #000; white-space: pre-wrap; word-break: keep-all; }
-.text-bold { font-weight: 800 !important; } /* 코멘터리 본문 굵게 보정 */
+.text-bold { font-weight: 800 !important; }
 
-/* 📱 [최적화 미디어 쿼리 - 갤럭시 S25 & 폴드7] */
-@media (max-width: 480px) { /* 일반 모바일 세로 */
+@media (max-width: 480px) {
   .hdr-inner { height: auto; flex-direction: column; padding: 15px 16px; gap: 15px; }
-  .hdr-brand { width: 100%; justify-content: center; }
   .copyright-text { display: block; border-left: none; padding-left: 0; margin-left: 0; margin-top: 5px; font-size: 11px; text-align: center; }
-  .hdr-center { width: 100%; order: 2; }
-  .hdr-right { width: 100%; order: 3; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn { width: 100%; justify-content: center; padding: 12px; }
-  .layout { padding: 16px 12px; flex-direction: column; }
-  .sidebar { width: 100%; order: 2; }
-  .main { order: 1; }
+  .hdr-right { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .grid4 { grid-template-columns: 1fr; }
-  /* 출력 버튼을 메인 날짜 옆으로 이동시키는 스타일 */
   .mobile-action-group { display: flex; gap: 8px; margin-top: 10px; width: 100%; }
-  .mobile-action-group .btn { flex: 1; }
 }
-
-@media (min-width: 481px) and (max-width: 1024px) { /* 폴드7 펼침 & 태블릿 */
-  .hdr-inner { height: auto; flex-wrap: wrap; padding: 15px 24px; justify-content: center; gap: 20px; }
-  .hdr-brand { width: 100%; justify-content: center; }
-  .hdr-right { width: 100%; justify-content: center; gap: 12px; }
-  .grid4 { grid-template-columns: 1fr 1fr; }
-  .layout { padding: 20px 24px; }
-}
+@media (min-width: 481px) and (max-width: 1024px) { .grid4 { grid-template-columns: 1fr 1fr; } }
 
 #overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 #overlay.open{display:flex;}
@@ -123,15 +93,13 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       <div class="hdr-mark">LAM</div>
       <div class="hdr-title">Daily <span>Chemical</span> Brief <span class="copyright-text">created by JSKIM of LAM (첨단구매1팀)</span></div>
     </div>
-    
     <div class="hdr-center">
       <div class="hdr-date-nav">
-        <button onclick="moveDate(1)" style="background:none;border:none;cursor:pointer;font-size:24px;padding:0 10px;">&#8249;</button>
+        <button onclick="moveDate(1)" style="background:none;border:none;cursor:pointer;font-size:24px;">&#8249;</button>
         <div class="hdr-date-lbl" id="hdr-date-lbl">—</div>
-        <button onclick="moveDate(-1)" style="background:none;border:none;cursor:pointer;font-size:24px;padding:0 10px;">&#8250;</button>
+        <button onclick="moveDate(-1)" style="background:none;border:none;cursor:pointer;font-size:24px;">&#8250;</button>
       </div>
     </div>
-    
     <div class="hdr-right">
       <button class="btn btn-outline" onclick="loadData()">새로고침</button>
       <button class="btn btn-primary" onclick="openModal()">+ NEW ENTRY</button>
@@ -143,7 +111,6 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   <aside class="sidebar">
     <div class="s-card"><div style="padding:11px 14px; font-size:12px; font-weight:800; color:var(--g2); border-bottom:1px solid var(--bd); background:#f9fafb;">날짜 아카이브</div><div class="arc-list" id="arc-list"></div></div>
   </aside>
-  
   <main class="main">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div style="font-family:var(--disp); font-size:28px; font-weight:900;" id="main-date">—</div>
@@ -152,7 +119,6 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
         <button class="btn btn-outline" onclick="window.print()">PDF 출력</button>
       </div>
     </div>
-    
     <div class="grid4" id="grid"></div>
   </main>
 </div>
@@ -164,10 +130,10 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       <button onclick="closeModal()" style="background:none; border:none; cursor:pointer; font-size:28px;">&times;</button>
     </div>
     <div style="display:flex; border-bottom:1px solid #eee; overflow-x:auto;">
-      <button class="m-tab active" onclick="switchTab('WTI')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800; white-space:nowrap;">WTI</button>
-      <button class="m-tab" onclick="switchTab('Styrene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800; white-space:nowrap;">Styrene</button>
-      <button class="m-tab" onclick="switchTab('Benzene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800; white-space:nowrap;">Benzene</button>
-      <button class="m-tab" onclick="switchTab('Butadiene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800; white-space:nowrap;">Butadiene</button>
+      <button class="m-tab active" onclick="switchTab('WTI')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">WTI</button>
+      <button class="m-tab" onclick="switchTab('Styrene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Styrene</button>
+      <button class="m-tab" onclick="switchTab('Benzene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Benzene</button>
+      <button class="m-tab" onclick="switchTab('Butadiene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Butadiene</button>
     </div>
     <div id="tab-panels" style="flex:1; overflow-y:auto; padding:20px;"></div>
     <div style="padding:15px 20px; background:#f9fafb; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px;">
@@ -179,13 +145,11 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
-// [GAS 및 스크립트 로직 유지 - 비밀번호 0111 적용]
 const GAS='https://script.google.com/macros/s/AKfycbxZMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
 let allData={}, allDates=[], curDate='', activeTab='WTI';
 
-// 관리자 보안 체크 함수
 function checkAdmin() {
   const pw = prompt("관리자 비밀번호를 입력하세요:");
   if (pw === "0111") return true;
@@ -196,9 +160,9 @@ function checkAdmin() {
 function buildPanels(){
   document.getElementById('tab-panels').innerHTML=PRODS.map(p=>`
     <div class="tab-panel${p===activeTab?' active':''}" id="panel-${p}" style="display:${p===activeTab?'block':'none'}">
-      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:14px;" placeholder="${p} 뉴스 기사를 붙여넣으세요."></textarea>
+      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:14px;" placeholder="${p} 브리핑 전문을 붙여넣으세요."></textarea>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
-        <div><label style="font-size:11px; font-weight:700;">가격</label><input type="number" id="f-price-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
+        <div><label style="font-size:11px; font-weight:700;">가격</label><input type="number" id="f-price-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
         <div><label style="font-size:11px; font-weight:700;">변동률%</label><input type="number" id="f-pct-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
         <div><label style="font-size:11px; font-weight:700; color:red;">기준일</label><input type="date" id="f-date-${p}" style="width:100%; padding:7px; border:1.5px solid red; border-radius:5px;"></div>
       </div>
@@ -310,24 +274,84 @@ async function delEntry(prod,date){
   try{ await fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action:'delete', sheet:prod, rowKey:{date}})}); toast('🗑 삭제 완료', 'ok'); loadData(); } catch(e){}
 }
 
+// ⭐️ 강화된 WTI 브리핑 파싱 로직 ⭐️
+function parseWTI(txt) {
+  const f = {}; let m;
+
+  // 1. 새로운 구조화된 데일리 브리핑 양식 체크
+  if (txt.includes('WTI 데일리 브리핑')) {
+    // 가격 정보 추출: WTI M-1: $65.19/b (▲ $2.86/b, +4.59%)
+    m = txt.match(/WTI\s*M-1:\s*\$\s*([\d,.]+)\/b/i);
+    if (m) f.price = parseFloat(m[1].replace(/,/g, ''));
+
+    // 변동률 및 판정 추출
+    m = txt.match(/\(([▼▲])\s*\$\s*([\d,.]+)\/b,\s*([+-]?[\d.]+)%\)/i);
+    if (m) {
+      f.pct = parseFloat(m[3]);
+      f.direction = m[1] === '▲' ? '상승' : '하락';
+    }
+
+    // 2) 가격 변동 요인 한줄 -> 코멘터리에 매핑
+    m = txt.match(/2\)\s*가격\s*변동\s*요인\s*한줄[^\n]*\n([^\n]+)/);
+    if (m) f.commentary = m[1].trim();
+
+    // 3) 변동요인 구체 리스트 -> 변동요인에 매핑 (줄바꿈 포함)
+    const sec3 = txt.match(/3\)\s*변동요인\s*구체\s*리스트[^\n]*\n([\s\S]*?)(?=\n4\)|$)/);
+    if (sec3) {
+      f.factors = sec3[1].split('\n').map(s => s.trim()).filter(s => s.length > 2).map(s => '• ' + s).join('\n');
+    }
+
+    // 4) 결론 및 전망
+    m = txt.match(/4\)\s*결론\s*및\s*전망[^\n]*\n([^\n]+)/);
+    if (m) {
+      const outlook = m[1].trim();
+      if (f.factors) f.factors += "\n\n[전망] " + outlook;
+      else f.factors = "[전망] " + outlook;
+    }
+
+    // 날짜: D-1이므로 어제로 설정
+    const now = new Date();
+    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    f.dateStr = yesterday.toISOString().split('T')[0];
+
+    return f;
+  }
+
+  // 2. 기존 일반 뉴스 기사 파싱 로직 (Fallback)
+  m=txt.match(/(?:하락한|오른|밀린|내린|상승한)\s*배럴당\s*([\d.]+)달러/);if(m)f.price=parseFloat(m[1]);
+  m=txt.match(/\(([\d.+-]+)%\)/); if(pctM) f.pct = m[1];
+  if(txt.includes('상승') || txt.includes('▲')) f.direction = '상승';
+  else if(txt.includes('하락') || txt.includes('▼')) f.direction = '하락';
+  return f;
+}
+
 function doParse(){
   const p=activeTab, txt=document.getElementById(`ta-${p}`).value.trim();
   if(!txt) return;
-  const priceM = txt.match(/배럴당\s*([\d,.]+)\s*달러/) || txt.match(/CFR\s*China[^\n]*?\$\s*([\d,.]+)/i) || txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,.]+)/i);
-  if(priceM) document.getElementById(`f-price-${p}`).value = priceM[1].replace(/,/g,'');
-  const pctM = txt.match(/\(([\d.+-]+)%\)/);
-  if(pctM) document.getElementById(`f-pct-${p}`).value = pctM[1];
-  if(txt.includes('상승') || txt.includes('▲')) document.getElementById(`f-dir-${p}`).value = '상승';
-  else if(txt.includes('하락') || txt.includes('▼')) document.getElementById(`f-dir-${p}`).value = '하락';
-  const dateM = txt.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) || txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
-  if(dateM) document.getElementById(`f-date-${p}`).value = `${dateM[1]}-${dateM[2].padStart(2,'0')}-${dateM[3].padStart(2,'0')}`;
-  else {
-    const lcM = txt.match(/(\d{1,2})일\s*\(현지시간\)/);
-    if(lcM) { const now = new Date(); let d = new Date(now.getFullYear(), now.getMonth(), parseInt(lcM[1]) + 1); document.getElementById(`f-date-${p}`).value = d.toISOString().split('T')[0]; }
+
+  let f;
+  if(p==='WTI') {
+    f = parseWTI(txt);
+  } else {
+    // SM/BZ/BD 기존 파싱 로직
+    f = {}; 
+    const priceM = txt.match(/CFR\s*China[^\n]*?\$\s*([\d,.]+)/i) || txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,.]+)/i);
+    if(priceM) f.price = priceM[1].replace(/,/g,'');
+    const pctM = txt.match(/\(([\d.+-]+)%\)/);
+    if(pctM) f.pct = pctM[1];
+    if(txt.includes('상승') || txt.includes('▲')) f.direction = '상승';
+    else if(txt.includes('하락') || txt.includes('▼')) f.direction = '하락';
+    const dateM = txt.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) || txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
+    if(dateM) f.dateStr = `${dateM[1]}-${dateM[2].padStart(2,'0')}-${dateM[3].padStart(2,'0')}`;
   }
-  let fTxt = txt.split(/[.\n]/).filter(s => s.length > 20).slice(0, 6).join('.\n\n');
-  if(txt.includes('**')) { fTxt = txt.split('**').filter(s => s.trim().length > 5).map(s => '• ' + s.replace(/\//g, '').trim()).join('\n\n'); }
-  document.getElementById(`f-fa-${p}`).value = fTxt;
+
+  if(f.price) document.getElementById(`f-price-${p}`).value = f.price;
+  if(f.pct) document.getElementById(`f-pct-${p}`).value = f.pct;
+  if(f.direction) document.getElementById(`f-dir-${p}`).value = f.direction;
+  if(f.dateStr) document.getElementById(`f-date-${p}`).value = f.dateStr;
+  if(f.commentary) document.getElementById(`f-co-${p}`).value = f.commentary;
+  if(f.factors) document.getElementById(`f-fa-${p}`).value = f.factors;
+
   toast(`${p} 파싱 완료`, 'ok');
 }
 
