@@ -25,13 +25,16 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;flex-shrink:0;}
 
+/* LAM 로고: 주황색 박스 + 검은색 글자 */
 .hdr-mark{width:50px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#000 !important;border:2px solid #000;}
+
 .hdr-title{font-family:var(--disp);font-size:18px;font-weight:900;color:#000;display:flex;align-items:baseline;}
 .hdr-title span { color: var(--lotte); }
 
+/* 저작권 문구: 검은색 + 아주 굵게(800) */
 .copyright-text { 
   font-family: var(--sans); font-size: 13px; font-weight: 800; color: #000 !important; 
-  margin-left: 14px; border-left: 2px solid #000; padding-left: 14px; white-space: nowrap;
+  margin-left: 14px; border-left: 2.5px solid #000; padding-left: 14px; white-space: nowrap;
 }
 
 .hdr-center{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;}
@@ -43,11 +46,32 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .btn-primary{background:var(--lotte);color:#fff;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
 
+/* 메인 레이아웃 */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
-.sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
-.s-card{background:var(--white);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh);}
-.arc-item{padding:12px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;}
-.arc-item.active{background:#FEF2F2;color:var(--lotte);font-weight:800;border-left:5px solid var(--lotte);}
+.sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+
+/* ⭐️ 날짜 어카이브 드롭다운 스타일 ⭐️ */
+.arc-select-wrap { position: relative; width: 100%; }
+.arc-select-btn {
+  width: 100%; padding: 12px 15px; background: var(--white); border: 2px solid #000; border-radius: 8px;
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: #000; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; box-shadow: var(--sh);
+}
+.arc-select-btn:hover { background: var(--g6); }
+.arc-select-btn::after { content: '▼'; font-size: 10px; margin-left: 10px; }
+
+.arc-dropdown {
+  position: absolute; top: 100%; left: 0; width: 100%; max-height: 350px; overflow-y: auto;
+  background: var(--white); border: 2px solid #000; border-top: none; border-radius: 0 0 8px 8px;
+  z-index: 100; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.arc-dropdown.show { display: block; }
+.arc-item {
+  padding: 11px 15px; font-family: var(--mono); font-size: 13px; color: var(--g2); cursor: pointer;
+  border-bottom: 1px solid var(--g6); display: flex; justify-content: space-between; align-items: center;
+}
+.arc-item:hover { background: #FFF9C4; color: #000; font-weight: 700; }
+.arc-item.active { background: #FEF2F2; color: var(--lotte); font-weight: 800; }
 
 .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
@@ -61,18 +85,23 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
 .d-abs{font-family:var(--mono);font-size:18px;font-weight:700;}
+
 .dir-badge{display:inline-block;padding:6px 16px;border-radius:30px;font-size:15px;font-weight:900;border:2px solid black;margin-bottom:15px;margin-left:18px;}
 .dir-badge.up{background:var(--up);color:white;}.dir-badge.dn{background:var(--dn);color:white;}.dir-badge.flt{background:var(--g3);color:white;}
 
+/* 굵은 코멘터리 보정 */
 .section-label-box { display: inline-block; background-color: var(--highlight-bg); border: 2px solid #000; padding: 4px 12px; margin: 15px 18px 8px; border-radius: 4px; }
 .section-label-text { font-family: var(--mono); font-size: 13px; font-weight: 900; color: #000; text-transform: uppercase; }
 .section-body-text { padding: 0 18px 18px; font-size: 16px; line-height: 1.65; color: #000; white-space: pre-wrap; word-break: keep-all; }
 .text-bold { font-weight: 800 !important; }
 
+/* 📱 [최적화 미디어 쿼리 - 갤럭시 S25 & 폴드7] */
 @media (max-width: 480px) {
   .hdr-inner { height: auto; flex-direction: column; padding: 15px 16px; gap: 15px; }
   .copyright-text { display: block; border-left: none; padding-left: 0; margin-left: 0; margin-top: 5px; font-size: 11px; text-align: center; }
   .hdr-right { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .layout { padding: 16px 12px; flex-direction: column; }
+  .sidebar { width: 100%; }
   .grid4 { grid-template-columns: 1fr; }
   .mobile-action-group { display: flex; gap: 8px; margin-top: 10px; width: 100%; }
 }
@@ -109,8 +138,13 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="s-card"><div style="padding:11px 14px; font-size:12px; font-weight:800; color:var(--g2); border-bottom:1px solid var(--bd); background:#f9fafb;">날짜 아카이브</div><div class="arc-list" id="arc-list"></div></div>
+    <div class="arc-select-wrap">
+      <div style="font-size:11px; font-weight:800; color:var(--g3); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">Archive</div>
+      <button class="arc-select-btn" id="arc-selected-label" onclick="toggleArc()">날짜 선택</button>
+      <div class="arc-dropdown" id="arc-dropdown"></div>
+    </div>
   </aside>
+  
   <main class="main">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
       <div style="font-family:var(--disp); font-size:28px; font-weight:900;" id="main-date">—</div>
@@ -145,11 +179,12 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
-const GAS='https://script.google.com/macros/s/AKfycbxZMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
+const GAS='https://script.google.com/macros/s/AKfycbzMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
 let allData={}, allDates=[], curDate='', activeTab='WTI';
 
+// 관리자 보안 체크
 function checkAdmin() {
   const pw = prompt("관리자 비밀번호를 입력하세요:");
   if (pw === "0111") return true;
@@ -157,10 +192,14 @@ function checkAdmin() {
   return false;
 }
 
+// ⭐️ 드롭다운 토글 ⭐️
+function toggleArc() { document.getElementById('arc-dropdown').classList.toggle('show'); }
+window.onclick = function(e) { if (!e.target.matches('.arc-select-btn')) { document.getElementById('arc-dropdown').classList.remove('show'); } }
+
 function buildPanels(){
   document.getElementById('tab-panels').innerHTML=PRODS.map(p=>`
     <div class="tab-panel${p===activeTab?' active':''}" id="panel-${p}" style="display:${p===activeTab?'block':'none'}">
-      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:14px;" placeholder="${p} 브리핑 전문을 붙여넣으세요."></textarea>
+      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:14px;" placeholder="${p} 브리핑 전문"></textarea>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:15px;">
         <div><label style="font-size:11px; font-weight:700;">가격</label><input type="number" id="f-price-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
         <div><label style="font-size:11px; font-weight:700;">변동률%</label><input type="number" id="f-pct-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
@@ -187,6 +226,7 @@ async function loadData(){
 function renderDate(date){
   curDate=date; document.getElementById('hdr-date-lbl').textContent=date;
   document.getElementById('main-date').textContent=date;
+  document.getElementById('arc-selected-label').textContent = date;
   document.getElementById('grid').innerHTML=PRODS.map(p=>renderCard(p,(allData[p]||[]).find(e=>e.date===date),date)).join('');
   buildArc();
 }
@@ -210,17 +250,16 @@ function renderCard(prod,entry,date){
       <div class="p-delta ${dir}">${(entry.changePct>=0?'+':'')+entry.changePct.toFixed(2)}%</div>
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
-    
     <div class="section-label-box"><span class="section-label-text">COMMENTARY</span></div>
     <div class="section-body-text text-bold">${entry.commentary}</div>
-    
     <div class="section-label-box"><span class="section-label-text">MARKET FACTORS</span></div>
     <div class="section-body-text text-normal">${entry.factors}</div>
   </div>`;
 }
 
+// ⭐️ 드롭다운 빌드 ⭐️
 function buildArc(){
-  document.getElementById('arc-list').innerHTML=allDates.slice(0,15).map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')"><span>${d}</span><span>&rsaquo;</span></div>`).join('');
+  document.getElementById('arc-dropdown').innerHTML=allDates.map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')">${d}</div>`).join('');
 }
 
 function moveDate(offset){
@@ -274,67 +313,31 @@ async function delEntry(prod,date){
   try{ await fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action:'delete', sheet:prod, rowKey:{date}})}); toast('🗑 삭제 완료', 'ok'); loadData(); } catch(e){}
 }
 
-// ⭐️ 강화된 WTI 브리핑 파싱 로직 ⭐️
 function parseWTI(txt) {
   const f = {}; let m;
-
-  // 1. 새로운 구조화된 데일리 브리핑 양식 체크
   if (txt.includes('WTI 데일리 브리핑')) {
-    // 가격 정보 추출: WTI M-1: $65.19/b (▲ $2.86/b, +4.59%)
     m = txt.match(/WTI\s*M-1:\s*\$\s*([\d,.]+)\/b/i);
     if (m) f.price = parseFloat(m[1].replace(/,/g, ''));
-
-    // 변동률 및 판정 추출
     m = txt.match(/\(([▼▲])\s*\$\s*([\d,.]+)\/b,\s*([+-]?[\d.]+)%\)/i);
-    if (m) {
-      f.pct = parseFloat(m[3]);
-      f.direction = m[1] === '▲' ? '상승' : '하락';
-    }
-
-    // 2) 가격 변동 요인 한줄 -> 코멘터리에 매핑
+    if (m) { f.pct = parseFloat(m[3]); f.direction = m[1] === '▲' ? '상승' : '하락'; }
     m = txt.match(/2\)\s*가격\s*변동\s*요인\s*한줄[^\n]*\n([^\n]+)/);
     if (m) f.commentary = m[1].trim();
-
-    // 3) 변동요인 구체 리스트 -> 변동요인에 매핑 (줄바꿈 포함)
     const sec3 = txt.match(/3\)\s*변동요인\s*구체\s*리스트[^\n]*\n([\s\S]*?)(?=\n4\)|$)/);
-    if (sec3) {
-      f.factors = sec3[1].split('\n').map(s => s.trim()).filter(s => s.length > 2).map(s => '• ' + s).join('\n');
-    }
-
-    // 4) 결론 및 전망
+    if (sec3) { f.factors = sec3[1].split('\n').map(s => s.trim()).filter(s => s.length > 2).map(s => '• ' + s).join('\n'); }
     m = txt.match(/4\)\s*결론\s*및\s*전망[^\n]*\n([^\n]+)/);
-    if (m) {
-      const outlook = m[1].trim();
-      if (f.factors) f.factors += "\n\n[전망] " + outlook;
-      else f.factors = "[전망] " + outlook;
-    }
-
-    // 날짜: D-1이므로 어제로 설정
-    const now = new Date();
-    const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    if (m) { const outlook = m[1].trim(); if (f.factors) f.factors += "\n\n[전망] " + outlook; else f.factors = "[전망] " + outlook; }
+    const now = new Date(); const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
     f.dateStr = yesterday.toISOString().split('T')[0];
-
     return f;
   }
-
-  // 2. 기존 일반 뉴스 기사 파싱 로직 (Fallback)
-  m=txt.match(/(?:하락한|오른|밀린|내린|상승한)\s*배럴당\s*([\d.]+)달러/);if(m)f.price=parseFloat(m[1]);
-  m=txt.match(/\(([\d.+-]+)%\)/); if(pctM) f.pct = m[1];
-  if(txt.includes('상승') || txt.includes('▲')) f.direction = '상승';
-  else if(txt.includes('하락') || txt.includes('▼')) f.direction = '하락';
-  return f;
+  return {};
 }
 
 function doParse(){
   const p=activeTab, txt=document.getElementById(`ta-${p}`).value.trim();
   if(!txt) return;
-
-  let f;
-  if(p==='WTI') {
-    f = parseWTI(txt);
-  } else {
-    // SM/BZ/BD 기존 파싱 로직
-    f = {}; 
+  let f = p==='WTI' ? parseWTI(txt) : {};
+  if(!f.price) {
     const priceM = txt.match(/CFR\s*China[^\n]*?\$\s*([\d,.]+)/i) || txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,.]+)/i);
     if(priceM) f.price = priceM[1].replace(/,/g,'');
     const pctM = txt.match(/\(([\d.+-]+)%\)/);
@@ -343,26 +346,21 @@ function doParse(){
     else if(txt.includes('하락') || txt.includes('▼')) f.direction = '하락';
     const dateM = txt.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) || txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
     if(dateM) f.dateStr = `${dateM[1]}-${dateM[2].padStart(2,'0')}-${dateM[3].padStart(2,'0')}`;
+    let fTxt = txt.split(/[.\n]/).filter(s => s.length > 20).slice(0, 6).join('.\n\n');
+    if(txt.includes('**')) { fTxt = txt.split('**').filter(s => s.trim().length > 5).map(s => '• ' + s.replace(/\//g, '').trim()).join('\n\n'); }
+    f.factors = fTxt;
   }
-
   if(f.price) document.getElementById(`f-price-${p}`).value = f.price;
   if(f.pct) document.getElementById(`f-pct-${p}`).value = f.pct;
   if(f.direction) document.getElementById(`f-dir-${p}`).value = f.direction;
   if(f.dateStr) document.getElementById(`f-date-${p}`).value = f.dateStr;
   if(f.commentary) document.getElementById(`f-co-${p}`).value = f.commentary;
   if(f.factors) document.getElementById(`f-fa-${p}`).value = f.factors;
-
   toast(`${p} 파싱 완료`, 'ok');
 }
 
 function toast(m,t){const e=document.getElementById('toast'); e.textContent=m; e.className='show '+t; e.style.background=(t==='ok'?'#065F46':'#991B1B'); setTimeout(()=>e.className='',3000);}
-
-function dlImage(){
-  const el=document.getElementById('grid');
-  html2canvas(el, {backgroundColor:'#f9fafb', scale:2}).then(canvas => {
-    const a = document.createElement('a'); a.href=canvas.toDataURL(); a.download=`DailyBrief_${curDate}.png`; a.click();
-  });
-}
+function dlImage(){ const el=document.getElementById('grid'); html2canvas(el, {backgroundColor:'#f9fafb', scale:2}).then(canvas => { const a = document.createElement('a'); a.href=canvas.toDataURL(); a.download=`DailyBrief_${curDate}.png`; a.click(); }); }
 
 buildPanels();
 loadData();
