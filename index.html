@@ -80,7 +80,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .card-bar.bz{background:var(--bz);}
 .card-bar.bd{background:var(--bd2);}
 .card-hdr{padding:14px 16px 11px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between;}
-.card-prod{font-family:var(--disp);font-size:14px;font-weight:900;letter-spacing:-.1px;}
+.card-prod{font-family:var(--disp);font-size:17px;font-weight:900;letter-spacing:-.1px;}
 .card-prod.wti{color:var(--wti);}
 .card-prod.sm{color:var(--sm);}
 .card-prod.bz{color:var(--bz);}
@@ -98,7 +98,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .p-arrow{font-size:20px;font-weight:900;line-height:1;}
 .p-arrow.up{color:var(--up);}.p-arrow.dn{color:var(--dn);}.p-arrow.flt{color:var(--flt);}
 .p-delta{text-align:right;}
-.d-abs{font-family:var(--mono);font-size:13px;font-weight:500;line-height:1.3;}
+.d-abs{font-family:var(--mono);font-size:15px;font-weight:500;line-height:1.3;}
 .d-abs.up{color:var(--up);}.d-abs.dn{color:var(--dn);}.d-abs.flt{color:var(--flt);}
 .d-pct{font-family:var(--mono);font-size:11px;color:var(--g4);line-height:1.3;}
 .dir-wrap{padding:0 16px 8px;display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
@@ -119,8 +119,8 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .sec-lbl.co::before{background:var(--lotte);}
 .sec-lbl.fa::before{background:var(--g3);}
 .sec-lbl.ou::before{background:var(--g1);}
-.sec-txt{font-size:12px;line-height:1.72;color:var(--g2);word-break:keep-all;}
-.sec-txt.co{font-size:12.5px;font-weight:500;color:var(--g1);}
+.sec-txt{font-size:14px;line-height:1.78;color:var(--g2);word-break:keep-all;}
+.sec-txt.co{font-size:14.5px;font-weight:600;color:var(--g1);}
 .card-foot{padding:9px 16px;background:var(--g7);border-top:1px solid var(--bd);display:flex;gap:5px;justify-content:flex-end;margin-top:auto;}
 .cp-btn{font-family:var(--mono);font-size:10px;background:var(--white);border:1px solid var(--bd);color:var(--g3);padding:4px 9px;border-radius:4px;cursor:pointer;transition:all .12s;}
 .cp-btn:hover{border-color:var(--g3);color:var(--g1);}
@@ -472,6 +472,7 @@ function doParse(){
   if(!f.price){m=txt.match(/\$\s*([\d,.]+)\s*\/\s*(?:MT|톤)/i);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
   if(!f.price){m=txt.match(/([\d,]+(?:\.\d+)?)\s*달러\s*\/\s*톤/);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
   if(!f.price){m=txt.match(/(?:톤당|배럴당)\s*([\d,]+(?:\.\d+)?)\s*달러/);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
+  if(!f.price){m=txt.match(/(?:오른|밀린|하락한|상승한|내린)\s*([\d.]+)달러에\s*(?:마감|거래|체결)/);if(m)f.price=parseFloat(m[1]);}
   m=txt.match(/([\d.]+)달러\(([\d.]+)%\)\s*(?:하락|내린|밀린|떨어진)/);
   if(m){f.change=-parseFloat(m[1]);f.pct=-parseFloat(m[2]);}
   if(!f.change){m=txt.match(/([\d.]+)달러\(([\d.]+)%\)\s*(?:상승|오른|올라)/);if(m){f.change=parseFloat(m[1]);f.pct=parseFloat(m[2]);}}
@@ -502,9 +503,55 @@ function doParse(){
     const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${f.change.toFixed(2)} USD, `:'';
     document.getElementById(`f-co-${p}`).value=`${p}는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 ${UNITS[p]==='$/bbl'?'배럴당':'톤당'} $${f.price.toFixed(2)}에 ${dir} 마감했다.`;
   }
+  // 변동요인 자동추출
+  const factorTxt=extractFactors(txt,dir);
+  if(factorTxt)document.getElementById(`f-fa-${p}`).value=factorTxt;
+  // 결론전망 자동추출
+  const outlookTxt=extractOutlook(txt);
+  if(outlookTxt)document.getElementById(`f-ou-${p}`).value=outlookTxt;
   tabDone[p]=true;updDots();
   const ok=f.price&&f.pct!=null;
   showSt(p,ok?'ok':'warn',ok?`✓ ${p} $${(f.price||0).toFixed(2)} (${(f.pct||0)>=0?'+':''}${(f.pct||0).toFixed(2)}%) ${dir}`:'수치 일부 파싱 실패 — 수동 확인');
+}
+function splitSents(txt){
+  return txt.split(/(?<=[다습니다까요었다]\.)\s+|(?<=다\.\s)|(?<=\n)/)
+    .map(s=>s.trim()).filter(s=>s.length>10&&s.length<250);
+}
+function trimSent(s,max=120){
+  if(!s)return'';
+  s=s.replace(/^[^가-힣a-zA-Z$\d"]+/,'').trim();
+  if(s.length<=max)return s;
+  const cut=s.lastIndexOf(' ',max);
+  return(cut>50?s.slice(0,cut):s.slice(0,max))+'…';
+}
+function extractFactors(txt,dir){
+  const ss=splitSents(txt);
+  // 하락요인: OPEC증산, 재고증가, 이란합의, 달러강세, 경기침체 등
+  const bearKw=['증산','재고 증가','이란','합의','달러 강세','경기침체','수요 감소','공급 과잉'];
+  // 상승요인: 감산, 재고감소, 중동긴장, 달러약세, 호르무즈 등
+  const bullKw=['감산','재고 감소','중동','항모','호르무즈','달러 약세','저가 매수','수요 증가'];
+  const kws=dir==='하락'?bearKw:dir==='상승'?bullKw:[...bearKw,...bullKw];
+  const found=[];
+  for(const kw of kws){
+    const s=ss.find(x=>x.includes(kw)&&!found.includes(x));
+    if(s&&found.length<2)found.push(trimSent(s,100));
+  }
+  return found.join(' / ');
+}
+function extractOutlook(txt){
+  const ss=splitSents(txt);
+  const pp=[
+    /전망이다/,/예상된다/,/보일 것/,/것으로 보인다/,/것으로 예상/,
+    /할 것이라/,/될 것으로/,/이어질 것/,/지속될/,/주목된다/,
+    /향후/,/앞으로/
+  ];
+  for(const p of pp){
+    const s=ss.find(x=>p.test(x));
+    if(s)return trimSent(s,120);
+  }
+  // 마지막 문장 fallback
+  if(ss.length>0)return trimSent(ss[ss.length-1],120);
+  return null;
 }
 function showSt(p,t,m){const el=document.getElementById('ps-'+p);if(!el)return;el.style.display='block';el.className=`parse-status ${t}`;el.textContent=m;}
 function autoPct(p){
