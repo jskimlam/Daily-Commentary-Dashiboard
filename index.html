@@ -274,7 +274,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 
 <script>
-const GAS='https://script.google.com/macros/s/AKfycbw-pDuq9xGaVmGg56lAxzV8bGLeHecSQdRK5bEpGY-_u1ibPgEHxE0eiRBxjXQSWQx7/exec';
+const GAS='https://script.google.com/macros/s/AKfycbyyZ3onwZi_B50yUucQ2iy4J8XPiZ7x4rFEsduN3FGczAjpCJubKBIqEtPe-1fLR8Cp/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const UNITS={WTI:'$/bbl',Styrene:'$/MT',Benzene:'$/MT',Butadiene:'$/MT'};
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
@@ -463,55 +463,140 @@ function fillF(p,e){
   g(`f-date-${p}`).value=(e.date||'').replace(/\./g,'-');g(`f-dir-${p}`).value=e.direction||'보합';
   g(`f-co-${p}`).value=e.commentary||'';g(`f-fa-${p}`).value=e.factors||'';g(`f-ou-${p}`).value=e.outlook||'';
 }
-function doParse(){
-  const p=activeTab,txt=(document.getElementById('ta-'+p)||{}).value?.trim();
-  if(!txt){showSt(p,'warn','텍스트 없음 — 수동 입력 모드');return;}
+// ── WTI: 일반 뉴스 기사 파싱 ──
+function parseWTI(txt){
   const f={};let m;
   m=txt.match(/(?:하락한|오른|밀린|내린|상승한)\s*배럴당\s*([\d.]+)달러/);if(m)f.price=parseFloat(m[1]);
   if(!f.price){m=txt.match(/배럴당\s*([\d.]+)달러에\s*(?:거래|마감|체결)/);if(m)f.price=parseFloat(m[1]);}
-  if(!f.price){m=txt.match(/\$\s*([\d,.]+)\s*\/\s*(?:MT|톤)/i);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
-  if(!f.price){m=txt.match(/([\d,]+(?:\.\d+)?)\s*달러\s*\/\s*톤/);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
-  if(!f.price){m=txt.match(/(?:톤당|배럴당)\s*([\d,]+(?:\.\d+)?)\s*달러/);if(m)f.price=parseFloat(m[1].replace(/,/g,''));}
   if(!f.price){m=txt.match(/(?:오른|밀린|하락한|상승한|내린)\s*([\d.]+)달러에\s*(?:마감|거래|체결)/);if(m)f.price=parseFloat(m[1]);}
   m=txt.match(/([\d.]+)달러\(([\d.]+)%\)\s*(?:하락|내린|밀린|떨어진)/);
   if(m){f.change=-parseFloat(m[1]);f.pct=-parseFloat(m[2]);}
   if(!f.change){m=txt.match(/([\d.]+)달러\(([\d.]+)%\)\s*(?:상승|오른|올라)/);if(m){f.change=parseFloat(m[1]);f.pct=parseFloat(m[2]);}}
   if(!f.pct){m=txt.match(/([\d.]+)%\s*(하락|상승)/);if(m)f.pct=m[2]==='하락'?-parseFloat(m[1]):parseFloat(m[1]);}
   if(!f.change&&f.price&&f.pct){const prev=f.price/(1+f.pct/100);f.change=parseFloat((f.price-prev).toFixed(2));}
+  // 날짜 파싱
   let aY=null,aMo=null;
   const ymM=txt.match(/(\d{4})[년.\-\/]\s*(\d{1,2})[월.\-\/]/);
   if(ymM){aY=parseInt(ymM[1]);aMo=parseInt(ymM[2]);}
   const trM=txt.match(/(\d{1,2})일\s+(?:소폭\s*)?(?:하락|상승|마감|거래|체결)/);
-  if(trM&&aY&&aMo){document.getElementById(`f-date-${p}`).value=`${aY}-${String(aMo).padStart(2,'0')}-${String(parseInt(trM[1])).padStart(2,'0')}`;}
+  if(trM&&aY&&aMo){f.dateStr=`${aY}-${String(aMo).padStart(2,'0')}-${String(parseInt(trM[1])).padStart(2,'0')}`;}
   else{
     const lcM=txt.match(/(\d{1,2})일\s*\(현지시간\)/);
     if(lcM&&aY&&aMo){
       let day=parseInt(lcM[1])+1,mo=aMo,yr=aY;const mx=new Date(yr,mo,0).getDate();
       if(day>mx){day=1;mo=mo%12+1;if(mo===1)yr++;}
-      document.getElementById(`f-date-${p}`).value=`${yr}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      f.dateStr=`${yr}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     }else{
-      const fdM=txt.match(/(\d{4})[년.\-\/]\s*(\d{1,2})[월.\-\/]\s*(\d{1,2})/);
-      if(fdM)document.getElementById(`f-date-${p}`).value=`${fdM[1]}-${fdM[2].padStart(2,'0')}-${fdM[3].padStart(2,'0')}`;
+      const fdM=txt.match(/(\d{4})[年년.\-\/]\s*(\d{1,2})[月월.\-\/]\s*(\d{1,2})/);
+      if(fdM)f.dateStr=`${fdM[1]}-${fdM[2].padStart(2,'0')}-${fdM[3].padStart(2,'0')}`;
     }
   }
+  // WTI 코멘터리: 자동생성
+  if(f.price&&f.pct!=null){
+    const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${f.change.toFixed(2)} USD, `:'';
+    const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
+    f.commentary=`WTI는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 배럴당 $${f.price.toFixed(2)}에 ${dir} 마감했다.`;
+  }
+  // WTI 변동요인/전망: 뉴스 기사 추출
+  const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
+  f.factors=extractFactors(txt,dir);
+  f.outlook=extractOutlook(txt);
+  return f;
+}
+
+// ── SM/BZ/BD: 구조화된 브리핑 양식 파싱 ──
+function parseBriefing(txt, prod){
+  const f={};let m;
+
+  // 날짜: 브리핑 첫 줄 (2026-02-13)
+  m=txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
+  if(m)f.dateStr=`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+
+  // 가격 추출: SM/BD → CFR China, BZ → FOB Korea
+  if(prod==='Benzene'){
+    // FOB Korea: "$XXX/mt" 또는 "FOB Korea: $XXX/mt"
+    m=txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,]+(?:\.\d+)?)\/mt/i);
+    if(m)f.price=parseFloat(m[1].replace(/,/g,''));
+    // 변동: FOB Korea 같은 줄에서 ▼/▲ $X/mt
+    if(m){
+      const line=txt.match(/FOB\s*Korea[^\n]*/i)?.[0]||'';
+      const cm=line.match(/([▼▲])\s*\$([\d.]+)\/mt/);
+      if(cm){f.change=cm[1]==='▼'?-parseFloat(cm[2]):parseFloat(cm[2]);}
+    }
+  } else {
+    // SM/BD → CFR China
+    m=txt.match(/CFR\s*China[^\n]*?\$\s*([\d,]+(?:\.\d+)?)\/mt/i);
+    if(m)f.price=parseFloat(m[1].replace(/,/g,''));
+    if(m){
+      const line=txt.match(/CFR\s*China[^\n]*/i)?.[0]||'';
+      const cm=line.match(/([▼▲])\s*\$([\d.]+)\/mt/);
+      if(cm){f.change=cm[1]==='▼'?-parseFloat(cm[2]):parseFloat(cm[2]);}
+    }
+  }
+
+  // 변동률 계산 (브리핑엔 % 없으므로 직접 계산)
+  if(f.price&&f.change!=null){
+    const prev=f.price-f.change;
+    f.pct=prev>0?parseFloat((f.change/prev*100).toFixed(2)):0;
+  }
+
+  // 방향 판단
+  const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
+
+  // 코멘터리: 섹션 3) 아래 * 첫 줄
+  const sec3=txt.match(/3\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|$)/);
+  if(sec3){
+    const bullets=sec3[1].match(/\*\s*(.+)/g);
+    if(bullets&&bullets.length>0)
+      f.commentary=bullets[0].replace(/^\*\s*/,'').trim();
+  }
+  // 코멘터리 없으면 자동 생성
+  if(!f.commentary&&f.price&&f.pct!=null){
+    const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${Math.abs(f.change).toFixed(0)} USD, `:'';
+    f.commentary=`${prod}(CFR China)는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 톤당 $${f.price.toFixed(0)}에 ${dir} 마감했다.`;
+  }
+
+  // 변동요인: 섹션 4) 아래 * 항목들
+  const sec4=txt.match(/4\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|$)/);
+  if(sec4){
+    const bullets=sec4[1].match(/\*\s*(.+)/g)||[];
+    f.factors=bullets.map(b=>b.replace(/^\*\s*/,'').trim()).filter(Boolean).join(' / ');
+  }
+
+  // 결론전망: 섹션 5) 아래 * 첫 줄
+  const sec5=txt.match(/5\)[^\n]*\n([\s\S]*?)(?=\n\d+\)|\(참고|$)/);
+  if(sec5){
+    const bullets=sec5[1].match(/\*\s*(.+)/g);
+    if(bullets&&bullets.length>0)
+      f.outlook=bullets[0].replace(/^\*\s*/,'').trim();
+  }
+
+  return f;
+}
+
+function doParse(){
+  const p=activeTab,txt=(document.getElementById('ta-'+p)||{}).value?.trim();
+  if(!txt){showSt(p,'warn','텍스트 없음 — 수동 입력 모드');return;}
+
+  // 제품별 파싱 분기
+  const f=p==='WTI'?parseWTI(txt):parseBriefing(txt,p);
+
+  // 공통 필드 적용
+  if(f.dateStr)document.getElementById(`f-date-${p}`).value=f.dateStr;
   const dir=(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
   document.getElementById(`f-dir-${p}`).value=dir;
   if(f.price)document.getElementById(`f-price-${p}`).value=f.price.toFixed(2);
   if(f.change!=null)document.getElementById(`f-change-${p}`).value=f.change.toFixed(2);
   if(f.pct!=null)document.getElementById(`f-pct-${p}`).value=f.pct.toFixed(2);
-  if(f.price&&f.pct!=null){
-    const ps=f.pct>=0?'+':'';const as=f.change!=null?`${f.change>=0?'+':''}${f.change.toFixed(2)} USD, `:'';
-    document.getElementById(`f-co-${p}`).value=`${p}는 ${as}${ps}${f.pct.toFixed(2)}% 변동하여 ${UNITS[p]==='$/bbl'?'배럴당':'톤당'} $${f.price.toFixed(2)}에 ${dir} 마감했다.`;
-  }
-  // 변동요인 자동추출
-  const factorTxt=extractFactors(txt,dir);
-  if(factorTxt)document.getElementById(`f-fa-${p}`).value=factorTxt;
-  // 결론전망 자동추출
-  const outlookTxt=extractOutlook(txt);
-  if(outlookTxt)document.getElementById(`f-ou-${p}`).value=outlookTxt;
+  if(f.commentary)document.getElementById(`f-co-${p}`).value=f.commentary;
+  if(f.factors)document.getElementById(`f-fa-${p}`).value=f.factors;
+  if(f.outlook)document.getElementById(`f-ou-${p}`).value=f.outlook;
+
   tabDone[p]=true;updDots();
   const ok=f.price&&f.pct!=null;
-  showSt(p,ok?'ok':'warn',ok?`✓ ${p} $${(f.price||0).toFixed(2)} (${(f.pct||0)>=0?'+':''}${(f.pct||0).toFixed(2)}%) ${dir}`:'수치 일부 파싱 실패 — 수동 확인');
+  showSt(p,ok?'ok':'warn',ok
+    ?`✓ ${p} $${(f.price||0).toFixed(2)} (${(f.pct||0)>=0?'+':''}${(f.pct||0).toFixed(2)}%) ${dir}`
+    :'수치 일부 파싱 실패 — 수동 확인');
 }
 function splitSents(txt){
   return txt.split(/(?<=[다습니다까요었다]\.)\s+|(?<=다\.\s)|(?<=\n)/)
