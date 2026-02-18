@@ -20,14 +20,19 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* 헤더 & 로고 디자인 */
+/* 헤더 영역 */
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;}
-.hdr-mark{width:45px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#fff;border:1.5px solid #000;}
+
+/* 1. 로고 마크 수정: 주황색 박스 + 검은색 LAM 텍스트 */
+.hdr-mark{width:45px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#000;border:2px solid #000;}
+
 .hdr-title{font-family:var(--disp);font-size:17px;font-weight:900;}
 .hdr-title span{color:var(--lotte);}
-.copyright-text { font-family: var(--sans); font-size: 10px; font-weight: 400; color: var(--g4); margin-left: 10px; }
+
+/* 2. 저작권 표기 수정: 검은색 및 크기 확대 */
+.copyright-text { font-family: var(--sans); font-size: 12px; font-weight: 600; color: #000; margin-left: 12px; border-left: 1px solid var(--bd); padding-left: 12px; }
 
 .hdr-date-nav{display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:6px 10px;}
 .hdr-date-lbl{font-family:var(--mono);font-size:15px;font-weight:700;min-width:100px;text-align:center;}
@@ -36,6 +41,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
 .sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
 .s-card{background:var(--white);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh);}
+.arc-list{max-height:450px;overflow-y:auto;}
 .arc-item{padding:10px 14px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;}
 .arc-item.active{background:#FEF2F2;color:var(--lotte);font-weight:700;border-left:4px solid var(--lotte);}
 
@@ -48,7 +54,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .card-hdr{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;}
 .card-prod{font-family:var(--disp);font-size:22px;font-weight:900;letter-spacing:-0.5px;}
 
-/* 가격 텍스트 */
+/* 가격 정보 */
 .card-price{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
 .p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
@@ -60,27 +66,24 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .dir-badge.dn{background:var(--dn);color:white;}
 .dir-badge.flt{background:var(--g3);color:white;}
 
-/* 노란색 제목 박스 & 본문 보정 */
-.section-label-box {
-  display: inline-block;
-  background-color: var(--highlight-bg);
-  border: 2px solid #000000;
-  padding: 4px 12px;
-  margin: 15px 18px 8px;
-  border-radius: 4px;
-}
+/* 노란색 제목 박스 & 본문 굵기 보정 */
+.section-label-box { display: inline-block; background-color: var(--highlight-bg); border: 2px solid #000; padding: 4px 12px; margin: 15px 18px 8px; border-radius: 4px; }
 .section-label-text { font-family: var(--mono); font-size: 13px; font-weight: 900; color: #000; text-transform: uppercase; }
 .section-body-text { padding: 0 18px 18px; font-size: 16px; line-height: 1.65; color: #000; white-space: pre-wrap; word-break: keep-all; }
-.text-bold { font-weight: 800; } /* 코멘터리 굵게 보정 */
+.text-bold { font-weight: 800; } /* 코멘터리 굵게 */
 .text-normal { font-weight: 500; }
 
-/* 공통 버튼 & 모달 */
+/* 공통 버튼 */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
 .btn-primary{background:var(--lotte);color:#fff;border:none;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
+
+/* 모달 */
 #overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 #overlay.open{display:flex;}
 #modal{width:860px;max-height:94vh;background:var(--white);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;}
+.m-tab.active{color:var(--lotte);border-bottom:4px solid var(--lotte);font-weight:700;}
+
 #toast{position:fixed;bottom:30px;right:30px;z-index:9999;padding:15px 25px;border-radius:10px;font-weight:700;color:#fff;opacity:0;transition:0.3s;}
 #toast.show{opacity:1;}
 
@@ -91,7 +94,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .layout { padding: 16px 12px; flex-direction: column; }
   .sidebar { width: 100%; order: 2; }
   .main { order: 1; }
-  .copyright-text { display: block; margin-top: 4px; }
+  .copyright-text { display: block; margin: 4px 0 0 0; border: none; padding: 0; text-align: center; }
 }
 @media (min-width: 481px) and (max-width: 900px) {
   .grid4 { grid-template-columns: 1fr 1fr; }
@@ -160,7 +163,8 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
-const GAS='https://script.google.com/macros/s/AKfycbzVVIRrWs14Y3vsS-o8l_l7_ckG-fPcfSP8UtCCZsiKdxPH7FId1VjQMLepeVd6tA0/exec';
+// 새로운 GAS URL 적용
+const GAS='https://script.google.com/macros/s/AKfycbzMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
 let allData={}, allDates=[], curDate='', activeTab='WTI';
@@ -168,7 +172,7 @@ let allData={}, allDates=[], curDate='', activeTab='WTI';
 function tick(){const k=new Date(Date.now()+9*3600000);document.getElementById('clock').textContent=k.toISOString().slice(0,19).replace('T',' ')+' KST';}
 tick();setInterval(tick,1000);
 
-// [비밀번호 통합 체크 함수]
+// [비밀번호 0111 체크 함수]
 function checkAdmin() {
   const pw = prompt("관리자 비밀번호를 입력하세요:");
   if (pw === "0111") return true;
@@ -229,8 +233,10 @@ function renderCard(prod,entry,date){
       <div class="p-delta ${dir}">${(entry.changePct>=0?'+':'')+entry.changePct.toFixed(2)}%</div>
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
+    
     <div class="section-label-box"><span class="section-label-text">COMMENTARY</span></div>
     <div class="section-body-text text-bold">${entry.commentary}</div>
+    
     <div class="section-label-box"><span class="section-label-text">MARKET FACTORS</span></div>
     <div class="section-body-text text-normal">${entry.factors}</div>
   </div>`;
@@ -246,7 +252,7 @@ function moveDate(offset){
   if(next) renderDate(next);
 }
 
-// 🔐 [비밀번호 0111 적용된 모달 오픈]
+// 🔐 [관리자 비밀번호 적용 모달]
 function openModal(prod,date,entry){
   if (!checkAdmin()) return;
   document.getElementById('overlay').classList.add('open');
@@ -287,7 +293,7 @@ async function doSaveAll(){
   if(count > 0){ toast(`✅ ${count}개 저장 성공`, 'ok'); closeModal(); loadData(); }
 }
 
-// 🔐 [비밀번호 0111 적용된 삭제]
+// 🔐 [관리자 비밀번호 적용 삭제]
 async function delEntry(prod,date){
   if (!checkAdmin()) return;
   if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
