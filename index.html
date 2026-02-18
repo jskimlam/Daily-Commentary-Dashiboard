@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Daily Chemical Brief</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -14,12 +14,12 @@
   --lotte:#E31837; --g1:#111827; --g2:#374151; --g3:#6B7280; --g4:#9CA3AF; --g7:#F9FAFB; --white:#FFFFFF;
   --bd:#E5E7EB; --sh:0 4px 12px rgba(0,0,0,0.08);
   --sans:'Noto Sans KR',sans-serif; --disp:'Montserrat',sans-serif; --mono:'DM Mono',monospace;
-  --highlight-bg: #FFEB3B; /* 노란색 */
+  --highlight-bg: #FFEB3B;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* 헤더 영역 */
+/* [PC 기본 레이아웃 - 유지] */
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;}
@@ -29,14 +29,12 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .hdr-date-nav{display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:6px 10px;}
 .hdr-date-lbl{font-family:var(--mono);font-size:15px;font-weight:700;min-width:100px;text-align:center;}
 
-/* 레이아웃 */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
 .sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
 .s-card{background:var(--white);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh);}
 .arc-item{padding:10px 14px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;}
 .arc-item.active{background:#FEF2F2;color:var(--lotte);font-weight:700;border-left:4px solid var(--lotte);}
 
-/* 메인 카드 디자인 */
 .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .p-card{background:var(--white);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;}
@@ -45,19 +43,17 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .card-hdr{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;}
 .card-prod{font-family:var(--disp);font-size:22px;font-weight:900;letter-spacing:-0.5px;}
 
-/* 가격 및 변동률 (크게) */
 .card-price{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
 .p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
 .d-abs{font-family:var(--mono);font-size:18px;font-weight:700;}
 
-/* 판정 뱃지 (가시성 강화) */
 .dir-badge{display:inline-block;padding:6px 16px;border-radius:30px;font-size:15px;font-weight:900;border:2px solid black;margin-bottom:15px;margin-left:18px;}
 .dir-badge.up{background:var(--up);color:white;}
 .dir-badge.dn{background:var(--dn);color:white;}
 .dir-badge.flt{background:var(--g3);color:white;}
 
-/* ⭐️ 제목 노란 박스 스타일 ⭐️ */
+/* [강조 노란 상자 제목] */
 .section-label-box {
   display: inline-block;
   background-color: var(--highlight-bg);
@@ -66,38 +62,43 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   margin: 15px 18px 8px;
   border-radius: 4px;
 }
-.section-label-text {
-  font-family: var(--mono);
-  font-size: 13px;
-  font-weight: 900;
-  color: #000;
-  text-transform: uppercase;
-}
+.section-label-text { font-family: var(--mono); font-size: 13px; font-weight: 900; color: #000; text-transform: uppercase; }
+.section-body-text { padding: 0 18px 18px; font-size: 16px; line-height: 1.65; font-weight: 500; color: #000; white-space: pre-wrap; word-break: keep-all; }
 
-/* 본문 텍스트 (크게) */
-.section-body-text {
-  padding: 0 18px 18px;
-  font-size: 16px;
-  line-height: 1.65;
-  font-weight: 500;
-  color: #000;
-  white-space: pre-wrap; /* 줄바꿈 반영 */
-  word-break: keep-all;
-}
-
-/* 버튼 스타일 */
+/* [버튼 및 기타] */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
 .btn-primary{background:var(--lotte);color:#fff;border:none;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
-
-/* 모달 */
 #overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 #overlay.open{display:flex;}
 #modal{width:860px;max-height:94vh;background:var(--white);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;}
-.m-tab.active{color:var(--lotte);border-bottom:4px solid var(--lotte);font-weight:700;}
-
 #toast{position:fixed;bottom:30px;right:30px;z-index:9999;padding:15px 25px;border-radius:10px;font-weight:700;color:#fff;opacity:0;transition:0.3s;}
 #toast.show{opacity:1;}
+
+/* 📱 [모바일 최적화 - 갤럭시 S25 기준] */
+@media (max-width: 480px) {
+  .hdr-inner { padding: 0 16px; height: auto; flex-direction: column; padding: 12px 0; gap: 10px; }
+  .hdr-right { width: 100%; justify-content: center; gap: 10px; }
+  .hdr-center { order: 3; width: 100%; }
+  .hdr-brand { order: 1; }
+  .layout { padding: 16px 12px; flex-direction: column; gap: 20px; }
+  .sidebar { width: 100%; order: 2; }
+  .main { order: 1; }
+  .grid4 { grid-template-columns: 1fr; gap: 16px; } /* 1열 배치 */
+  .p-val { font-size: 40px; } /* 텍스트 넘침 방지 */
+  .date-big { font-size: 24px; }
+  #modal { width: 96vw; max-height: 98vh; }
+  .section-body-text { font-size: 15px; }
+}
+
+/* 📱 [모바일 최적화 - 갤럭시 Z 폴드7 펼침 화면 기준] */
+@media (min-width: 481px) and (max-width: 900px) {
+  .layout { padding: 20px 16px; gap: 16px; }
+  .sidebar { width: 180px; }
+  .grid4 { grid-template-columns: 1fr 1fr; gap: 16px; } /* 2열 배치 */
+  .p-val { font-size: 42px; }
+  #modal { width: 90vw; }
+}
 </style>
 </head>
 <body>
@@ -116,7 +117,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       </div>
     </div>
     <div class="hdr-right">
-      <div id="clock" style="margin-right:15px; font-family:var(--mono); font-size:12px; color:var(--g3);"></div>
+      <div id="clock" style="font-family:var(--mono); font-size:12px; color:var(--g3);"></div>
       <button class="btn btn-outline" onclick="loadData()">새로고침</button>
       <button class="btn btn-primary" onclick="openModal()">+ NEW ENTRY</button>
     </div>
@@ -131,8 +132,8 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <div class="date-big" id="main-date">—</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn btn-outline" onclick="window.print()">PDF 출력</button>
-        <button class="btn btn-outline" onclick="dlImage()">이미지 저장</button>
+        <button class="btn btn-outline" onclick="window.print()">PDF</button>
+        <button class="btn btn-outline" onclick="dlImage()">이미지</button>
       </div>
     </div>
     <div class="grid4" id="grid"></div>
@@ -145,15 +146,15 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       <div style="font-weight:900; font-size:18px;" id="modal-title">NEW BRIEFING ENTRY</div>
       <button onclick="closeModal()" style="background:none; border:none; cursor:pointer; font-size:24px;">&times;</button>
     </div>
-    <div style="display:flex; border-bottom:1px solid #eee;">
-      <button class="m-tab active" onclick="switchTab('WTI')" data-tab="WTI" style="flex:1; padding:15px; border:none; background:none; cursor:pointer;">WTI</button>
-      <button class="m-tab" onclick="switchTab('Styrene')" data-tab="Styrene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer;">Styrene</button>
-      <button class="m-tab" onclick="switchTab('Benzene')" data-tab="Benzene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer;">Benzene</button>
-      <button class="m-tab" onclick="switchTab('Butadiene')" data-tab="Butadiene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer;">Butadiene</button>
+    <div style="display:flex; border-bottom:1px solid #eee; overflow-x:auto;">
+      <button class="m-tab active" onclick="switchTab('WTI')" data-tab="WTI" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; white-space:nowrap;">WTI</button>
+      <button class="m-tab" onclick="switchTab('Styrene')" data-tab="Styrene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; white-space:nowrap;">Styrene</button>
+      <button class="m-tab" onclick="switchTab('Benzene')" data-tab="Benzene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; white-space:nowrap;">Benzene</button>
+      <button class="m-tab" onclick="switchTab('Butadiene')" data-tab="Butadiene" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; white-space:nowrap;">Butadiene</button>
     </div>
     <div id="tab-panels" style="flex:1; overflow-y:auto; padding:20px;"></div>
     <div style="padding:15px 20px; background:#f9fafb; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px;">
-      <div id="m-info" style="flex:1; font-size:12px; color:var(--g4); align-self:center;">이미 입력된 내용을 수정하려면 ✎ 아이콘을 눌러 편집하세요.</div>
+      <div id="m-info" style="flex:1; font-size:12px; color:var(--g4); align-self:center;">✎ 아이콘을 눌러 기존 내용을 수정할 수 있습니다.</div>
       <button class="btn btn-outline" onclick="doParse()">파싱 실행</button>
       <button class="btn btn-primary" onclick="doSaveAll()">전체 저장</button>
     </div>
@@ -162,6 +163,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
+// [사용자 지정 GAS URL 적용]
 const GAS='https://script.google.com/macros/s/AKfycbxZMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
@@ -170,19 +172,18 @@ let allData={}, allDates=[], curDate='', activeTab='WTI';
 function tick(){const k=new Date(Date.now()+9*3600000);document.getElementById('clock').textContent=k.toISOString().slice(0,19).replace('T',' ')+' KST';}
 tick();setInterval(tick,1000);
 
-// 패널 유지 및 편집 기능 대응을 위해 최초 1회 빌드
 function buildPanels(){
   document.getElementById('tab-panels').innerHTML=PRODS.map(p=>`
     <div class="tab-panel${p===activeTab?' active':''}" id="panel-${p}" style="display:${p===activeTab?'block':'none'}">
-      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:13px;" placeholder="${p} 뉴스 기사를 붙여넣으세요."></textarea>
+      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:13px;" placeholder="${p} 뉴스 전문"></textarea>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
         <div><label style="font-size:11px; font-weight:700; color:#666;">가격</label><input type="number" id="f-price-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
-        <div><label style="font-size:11px; font-weight:700; color:#666;">변동률(%)</label><input type="number" id="f-pct-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
+        <div><label style="font-size:11px; font-weight:700; color:#666;">변동률%</label><input type="number" id="f-pct-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
         <div><label style="font-size:11px; font-weight:700; color:red;">기준일</label><input type="date" id="f-date-${p}" style="width:100%; padding:7px; border:1.5px solid red; border-radius:5px;"></div>
       </div>
-      <div style="margin-bottom:15px;"><label style="font-size:11px; font-weight:700;">시장판정</label><select id="f-dir-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"><option>상승</option><option>하락</option><option>보합</option></select></div>
-      <div style="margin-bottom:15px;"><label style="font-size:11px; font-weight:700;">코멘터리</label><textarea id="f-co-${p}" style="width:100%; height:80px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
-      <div><label style="font-size:11px; font-weight:700;">변동요인 및 전망</label><textarea id="f-fa-${p}" style="width:100%; height:200px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
+      <div style="margin-bottom:15px;"><label style="font-size:11px; font-weight:700;">판정</label><select id="f-dir-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"><option>상승</option><option>하락</option><option>보합</option></select></div>
+      <textarea id="f-co-${p}" style="width:100%; height:60px; padding:10px; margin-bottom:10px; border:1px solid #ccc; border-radius:5px;" placeholder="코멘터리"></textarea>
+      <textarea id="f-fa-${p}" style="width:100%; height:150px; padding:10px; border:1px solid #ccc; border-radius:5px;" placeholder="변동요인"></textarea>
     </div>`).join('');
 }
 
@@ -199,8 +200,7 @@ async function loadData(){
 }
 
 function renderDate(date){
-  curDate=date;
-  document.getElementById('hdr-date-lbl').textContent=date;
+  curDate=date; document.getElementById('hdr-date-lbl').textContent=date;
   document.getElementById('main-date').textContent=date;
   document.getElementById('grid').innerHTML=PRODS.map(p=>renderCard(p,(allData[p]||[]).find(e=>e.date===date),date)).join('');
   buildArc();
@@ -208,10 +208,9 @@ function renderDate(date){
 
 function renderCard(prod,entry,date){
   const cls=PCLS[prod];
-  if(!entry) return `<div class="p-card"><div class="card-bar ${cls}"></div><div style="padding:50px; text-align:center; color:#999;">데이터 없음</div></div>`;
+  if(!entry) return `<div class="p-card"><div class="card-bar ${cls}"></div><div style="padding:40px; text-align:center; color:#999; font-size:12px;">데이터 없음</div></div>`;
   const dir=entry.direction==='상승'?'up':entry.direction==='하락'?'dn':'flt';
   const eJSON=encodeURIComponent(JSON.stringify(entry));
-  
   return `<div class="p-card">
     <div class="card-bar ${cls}"></div>
     <div class="card-hdr">
@@ -226,17 +225,15 @@ function renderCard(prod,entry,date){
       <div class="p-delta ${dir}">${(entry.changePct>=0?'+':'')+entry.changePct.toFixed(2)}%</div>
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
-    
     <div class="section-label-box"><span class="section-label-text">COMMENTARY</span></div>
     <div class="section-body-text">${entry.commentary}</div>
-    
     <div class="section-label-box"><span class="section-label-text">MARKET FACTORS</span></div>
     <div class="section-body-text">${entry.factors}</div>
   </div>`;
 }
 
 function buildArc(){
-  document.getElementById('arc-list').innerHTML=allDates.slice(0,12).map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')"><span>${d}</span><span>&rsaquo;</span></div>`).join('');
+  document.getElementById('arc-list').innerHTML=allDates.slice(0,15).map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')"><span>${d}</span><span>&rsaquo;</span></div>`).join('');
 }
 
 function moveDate(offset){
@@ -248,8 +245,6 @@ function moveDate(offset){
 function openModal(prod,date,entry){
   document.getElementById('overlay').classList.add('open');
   if(prod) switchTab(prod);
-  
-  // 편집(Edit) 모드: 기존 내용 채우기
   if(entry && prod){
     document.getElementById('modal-title').textContent = 'EDIT BRIEFING ENTRY';
     document.getElementById(`f-price-${prod}`).value=entry.price;
@@ -273,25 +268,17 @@ function switchTab(p){
 }
 
 async function doSaveAll(){
-  const info = document.getElementById('m-info'); info.textContent = "구글 시트에 업데이트 중...";
+  const info = document.getElementById('m-info'); info.textContent = "저장 중...";
   let count = 0;
   for(const p of PRODS){
     const price = document.getElementById(`f-price-${p}`).value;
     const date = document.getElementById(`f-date-${p}`).value;
     if(price && date){
-      const data={
-        date: date.replace(/-/g,'.'),
-        price: parseFloat(price),
-        changePct: parseFloat(document.getElementById(`f-pct-${p}`).value || 0),
-        direction: document.getElementById(`f-dir-${p}`).value,
-        commentary: document.getElementById(`f-co-${p}`).value.trim(),
-        factors: document.getElementById(`f-fa-${p}`).value.trim(),
-        outlook: ''
-      };
+      const data={ date: date.replace(/-/g,'.'), price: parseFloat(price), changePct: parseFloat(document.getElementById(`f-pct-${p}`).value || 0), direction: document.getElementById(`f-dir-${p}`).value, commentary: document.getElementById(`f-co-${p}`).value.trim(), factors: document.getElementById(`f-fa-${p}`).value.trim(), outlook: '' };
       try { await fetch(GAS, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({action:'save', sheet:p, data}) }); count++; } catch(e){}
     }
   }
-  if(count > 0){ toast(`✅ ${count}개 품목 반영 성공`, 'ok'); closeModal(); loadData(); }
+  if(count > 0){ toast(`✅ ${count}개 저장 완료`, 'ok'); closeModal(); loadData(); }
 }
 
 async function delEntry(prod,date){
@@ -302,28 +289,21 @@ async function delEntry(prod,date){
 function doParse(){
   const p=activeTab, txt=document.getElementById(`ta-${p}`).value.trim();
   if(!txt) return;
-
   const priceM = txt.match(/배럴당\s*([\d,.]+)\s*달러/) || txt.match(/CFR\s*China[^\n]*?\$\s*([\d,.]+)/i) || txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,.]+)/i);
   if(priceM) document.getElementById(`f-price-${p}`).value = priceM[1].replace(/,/g,'');
   const pctM = txt.match(/\(([\d.+-]+)%\)/);
   if(pctM) document.getElementById(`f-pct-${p}`).value = pctM[1];
-  
   if(txt.includes('상승') || txt.includes('▲')) document.getElementById(`f-dir-${p}`).value = '상승';
   else if(txt.includes('하락') || txt.includes('▼')) document.getElementById(`f-dir-${p}`).value = '하락';
-
   const dateM = txt.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) || txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
   if(dateM) document.getElementById(`f-date-${p}`).value = `${dateM[1]}-${dateM[2].padStart(2,'0')}-${dateM[3].padStart(2,'0')}`;
   else {
     const lcM = txt.match(/(\d{1,2})일\s*\(현지시간\)/);
     if(lcM) { const now = new Date(); let d = new Date(now.getFullYear(), now.getMonth(), parseInt(lcM[1]) + 1); document.getElementById(`f-date-${p}`).value = d.toISOString().split('T')[0]; }
   }
-
-  // 줄바꿈 보강 파싱
-  let factorText = txt.split(/[.\n]/).filter(s => s.length > 20).slice(0, 5).join('.\n\n');
-  if(txt.includes('**')) { 
-     factorText = txt.split('**').filter(s => s.trim().length > 5).map(s => '• ' + s.replace(/\//g, '').trim()).join('\n\n');
-  }
-  document.getElementById(`f-fa-${p}`).value = factorText;
+  let fTxt = txt.split(/[.\n]/).filter(s => s.length > 20).slice(0, 6).join('.\n\n');
+  if(txt.includes('**')) { fTxt = txt.split('**').filter(s => s.trim().length > 5).map(s => '• ' + s.replace(/\//g, '').trim()).join('\n\n'); }
+  document.getElementById(`f-fa-${p}`).value = fTxt;
   toast(`${p} 파싱 완료`, 'ok');
 }
 
