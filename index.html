@@ -274,7 +274,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 
 <script>
-const GAS='https://script.google.com/macros/s/AKfycbwWzr2rC1OWI1OoWVoudyUKj1vIUq7xaQkb1cuq4eDEgW54KzUf9cZGWujRim4qZUmx/exec';
+const GAS='https://script.google.com/macros/s/AKfycbw-pDuq9xGaVmGg56lAxzV8bGLeHecSQdRK5bEpGY-_u1ibPgEHxE0eiRBxjXQSWQx7/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const UNITS={WTI:'$/bbl',Styrene:'$/MT',Benzene:'$/MT',Butadiene:'$/MT'};
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
@@ -559,6 +559,18 @@ function autoPct(p){
   const ch=parseFloat(document.getElementById(`f-change-${p}`)?.value);
   if(pr&&!isNaN(ch)&&pr-ch>0)document.getElementById(`f-pct-${p}`).value=(ch/(pr-ch)*100).toFixed(2);
 }
+function toB64(obj){
+  // JSON → UTF-8 바이트 → base64 (GAS Utilities.base64Decode 호환)
+  const str=JSON.stringify(obj);
+  const bytes=new TextEncoder().encode(str);
+  let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin);
+}
+async function gasGet(params){
+  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  const res=await fetch(GAS+'?'+qs);
+  return res.json();
+}
 async function doSave(){
   const p=activeTab,g=id=>document.getElementById(id);
   const price=parseFloat(g(`f-price-${p}`).value),pct=parseFloat(g(`f-pct-${p}`).value),dr=g(`f-date-${p}`).value;
@@ -567,11 +579,11 @@ async function doSave(){
     direction:g(`f-dir-${p}`).value,commentary:g(`f-co-${p}`).value.trim(),
     factors:g(`f-fa-${p}`).value.trim(),outlook:g(`f-ou-${p}`).value.trim()};
   const isEdit=editMode.sheet===p;
+  const action=isEdit?'edit':'save';
+  const payload={sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
   const btn=document.querySelector('.m-ftr .btn-primary');btn.textContent='저장 중...';btn.disabled=true;
   try{
-    const res=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:isEdit?'edit':'save',sheet:p,rowKey:isEdit?{date:editMode.date}:null,data})});
-    const r=await res.json();
+    const r=await gasGet({action,p:toB64(payload)});
     if(r.success){
       toast('✅ '+r.message,'ok');tabDone[p]=true;updDots();curDate=data.date;
       await loadData();
@@ -583,8 +595,8 @@ async function doSave(){
 async function delEntry(prod,date){
   if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
   try{
-    const res=await fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'delete',sheet:prod,rowKey:{date}})});
-    const r=await res.json();
+    const payload={sheet:prod,rowKey:{date}};
+    const r=await gasGet({action:'delete',p:toB64(payload)});
     if(r.success){toast('🗑 '+r.message,'ok');await loadData();}else toast('❌ '+r.message,'err');
   }catch(e){toast('❌ 오류: '+e.message,'err');}
 }
