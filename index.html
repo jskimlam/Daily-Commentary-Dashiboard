@@ -12,96 +12,91 @@
   --up:#DC2626; --dn:#1D4ED8; --flt:#111827;
   --up-bg:#FEF2F2; --dn-bg:#EFF6FF; --flt-bg:#F9FAFB;
   --lotte:#E31837; --g1:#111827; --g2:#374151; --g3:#6B7280; --g4:#9CA3AF; --g7:#F9FAFB; --white:#FFFFFF;
-  --bd:#E5E7EB; --sh:0 4px 6px -1px rgba(0,0,0,0.1);
+  --bd:#E5E7EB; --sh:0 4px 12px rgba(0,0,0,0.08);
   --sans:'Noto Sans KR',sans-serif; --disp:'Montserrat',sans-serif; --mono:'DM Mono',monospace;
-  /* 강조 박스 스타일 */
-  --highlight-bg: #FFEB3B;
-  --highlight-border: #000000;
-  --highlight-text: #000000;
+  --highlight-bg: #FFEB3B; /* 노란색 */
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* 헤더 */
+/* 헤더 영역 */
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;}
 .hdr-mark{width:38px;height:38px;background:var(--lotte);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:15px;font-weight:900;color:#fff;}
-.hdr-title{font-family:var(--disp);font-size:17px;font-weight:900;color:var(--g1);}
+.hdr-title{font-family:var(--disp);font-size:17px;font-weight:900;}
 .hdr-title span{color:var(--lotte);}
 .hdr-date-nav{display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:6px 10px;}
-.nav-btn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--g3);}
 .hdr-date-lbl{font-family:var(--mono);font-size:15px;font-weight:700;min-width:100px;text-align:center;}
 
 /* 레이아웃 */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
 .sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
 .s-card{background:var(--white);border:1px solid var(--bd);border-radius:10px;overflow:hidden;box-shadow:var(--sh);}
-.s-title{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--g3);padding:11px 14px;border-bottom:1px solid var(--bd);}
 .arc-item{padding:10px 14px;font-size:12px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;}
 .arc-item.active{background:#FEF2F2;color:var(--lotte);font-weight:700;border-left:4px solid var(--lotte);}
 
-/* 메인 카드 */
+/* 메인 카드 디자인 */
 .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
-.date-big{font-family:var(--disp);font-size:28px;font-weight:900;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-.p-card{background:var(--white);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;transition:transform 0.2s;}
-.p-card:hover{transform:translateY(-4px);}
+.p-card{background:var(--white);border:1px solid var(--bd);border-radius:14px;overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;}
 .card-bar{height:6px;}
 .card-bar.wti{background:#DC2626;}.card-bar.sm{background:#7C3AED;}.card-bar.bz{background:#0369A1;}.card-bar.bd{background:#047857;}
 .card-hdr{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;}
-.card-prod{font-family:var(--disp);font-size:20px;font-weight:900;letter-spacing:-0.5px;}
+.card-prod{font-family:var(--disp);font-size:22px;font-weight:900;letter-spacing:-0.5px;}
 
-/* 가격 및 뱃지 */
-.card-price{padding:0 18px 12px;display:flex;align-items:baseline;justify-content:space-between;}
-.p-val{font-family:var(--disp);font-size:42px;font-weight:900;line-height:1;}
+/* 가격 및 변동률 (크게) */
+.card-price{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
+.p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
-.d-abs{font-family:var(--mono);font-size:16px;font-weight:700;}
+.d-abs{font-family:var(--mono);font-size:18px;font-weight:700;}
 
-/* 상승/하락 뱃지 (확대) */
-.dir-badge{padding:6px 16px;border-radius:30px;font-size:14px;font-weight:900;text-transform:uppercase;border:2px solid transparent;}
-.dir-badge.up{background:var(--up-bg);color:var(--up);border-color:var(--up);}
-.dir-badge.dn{background:var(--dn-bg);color:var(--dn);border-color:var(--dn);}
-.dir-badge.flt{background:#f3f4f6;color:var(--g3);border-color:var(--bd);}
+/* 판정 뱃지 (가시성 강화) */
+.dir-badge{display:inline-block;padding:6px 16px;border-radius:30px;font-size:15px;font-weight:900;border:2px solid black;margin-bottom:15px;margin-left:18px;}
+.dir-badge.up{background:var(--up);color:white;}
+.dir-badge.dn{background:var(--dn);color:white;}
+.dir-badge.flt{background:var(--g3);color:white;}
 
-/* 강조 텍스트 박스 (노란색 상자) */
-.highlight-box {
-  margin: 12px 16px;
-  padding: 14px;
+/* ⭐️ 제목 노란 박스 스타일 ⭐️ */
+.section-label-box {
+  display: inline-block;
   background-color: var(--highlight-bg);
-  border: 2px solid var(--highlight-border);
-  border-radius: 10px;
-  color: var(--highlight-text);
-  box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+  border: 2px solid #000000;
+  padding: 4px 12px;
+  margin: 15px 18px 8px;
+  border-radius: 4px;
 }
-.sec-lbl-custom {
+.section-label-text {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 900;
+  color: #000;
   text-transform: uppercase;
-  margin-bottom: 8px;
-  display: block;
-  text-decoration: underline;
 }
-.sec-txt-custom {
-  font-size: 16px; /* 텍스트 크기 확대 */
-  line-height: 1.6;
+
+/* 본문 텍스트 (크게) */
+.section-body-text {
+  padding: 0 18px 18px;
+  font-size: 16px;
+  line-height: 1.65;
   font-weight: 500;
-  white-space: pre-wrap; /* 줄바꿈 유지 */
+  color: #000;
+  white-space: pre-wrap; /* 줄바꿈 반영 */
   word-break: keep-all;
 }
 
-/* 버튼 */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+/* 버튼 스타일 */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
 .btn-primary{background:var(--lotte);color:#fff;border:none;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
 
-/* 모달 및 기타 */
+/* 모달 */
 #overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
 #overlay.open{display:flex;}
-#modal{width:860px;max-height:94vh;background:var(--white);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);}
+#modal{width:860px;max-height:94vh;background:var(--white);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;}
 .m-tab.active{color:var(--lotte);border-bottom:4px solid var(--lotte);font-weight:700;}
-#toast{position:fixed;bottom:30px;right:30px;z-index:9999;padding:15px 25px;border-radius:10px;font-weight:700;color:#fff;opacity:0;transition:0.3s;box-shadow:var(--sh);}
+
+#toast{position:fixed;bottom:30px;right:30px;z-index:9999;padding:15px 25px;border-radius:10px;font-weight:700;color:#fff;opacity:0;transition:0.3s;}
 #toast.show{opacity:1;}
 </style>
 </head>
@@ -115,9 +110,9 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     </div>
     <div class="hdr-center">
       <div class="hdr-date-nav">
-        <button class="nav-btn" onclick="moveDate(1)">&#8249;</button>
+        <button onclick="moveDate(1)" style="background:none;border:none;cursor:pointer;font-size:20px;">&#8249;</button>
         <div class="hdr-date-lbl" id="hdr-date-lbl">—</div>
-        <button class="nav-btn" onclick="moveDate(-1)">&#8250;</button>
+        <button onclick="moveDate(-1)" style="background:none;border:none;cursor:pointer;font-size:20px;">&#8250;</button>
       </div>
     </div>
     <div class="hdr-right">
@@ -130,14 +125,14 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="s-card"><div class="s-title">날짜 아카이브</div><div class="arc-list" id="arc-list"></div></div>
+    <div class="s-card"><div style="padding:11px 14px; font-size:11px; font-weight:700; color:var(--g3); border-bottom:1px solid var(--bd);">날짜 아카이브</div><div class="arc-list" id="arc-list"></div></div>
   </aside>
   <main class="main">
-    <div class="date-hdr" style="display:flex; justify-content:space-between; align-items:center;">
-      <div><span class="date-big" id="main-date">—</span></div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="date-big" id="main-date">—</div>
       <div style="display:flex; gap:8px;">
-        <button class="btn btn-outline" onclick="dlPDF()">PDF</button>
-        <button class="btn btn-outline" onclick="dlImage()">이미지</button>
+        <button class="btn btn-outline" onclick="window.print()">PDF 출력</button>
+        <button class="btn btn-outline" onclick="dlImage()">이미지 저장</button>
       </div>
     </div>
     <div class="grid4" id="grid"></div>
@@ -146,7 +141,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 <div id="overlay">
   <div id="modal">
-    <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+    <div style="padding:20px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; background:#f9fafb;">
       <div style="font-weight:900; font-size:18px;" id="modal-title">NEW BRIEFING ENTRY</div>
       <button onclick="closeModal()" style="background:none; border:none; cursor:pointer; font-size:24px;">&times;</button>
     </div>
@@ -158,7 +153,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     </div>
     <div id="tab-panels" style="flex:1; overflow-y:auto; padding:20px;"></div>
     <div style="padding:15px 20px; background:#f9fafb; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px;">
-      <div id="m-info" style="flex:1; font-size:12px; color:var(--g4); align-self:center;">파싱 버튼을 누르면 요인이 줄바꿈되어 정리됩니다.</div>
+      <div id="m-info" style="flex:1; font-size:12px; color:var(--g4); align-self:center;">이미 입력된 내용을 수정하려면 ✎ 아이콘을 눌러 편집하세요.</div>
       <button class="btn btn-outline" onclick="doParse()">파싱 실행</button>
       <button class="btn btn-primary" onclick="doSaveAll()">전체 저장</button>
     </div>
@@ -175,18 +170,19 @@ let allData={}, allDates=[], curDate='', activeTab='WTI';
 function tick(){const k=new Date(Date.now()+9*3600000);document.getElementById('clock').textContent=k.toISOString().slice(0,19).replace('T',' ')+' KST';}
 tick();setInterval(tick,1000);
 
+// 패널 유지 및 편집 기능 대응을 위해 최초 1회 빌드
 function buildPanels(){
   document.getElementById('tab-panels').innerHTML=PRODS.map(p=>`
     <div class="tab-panel${p===activeTab?' active':''}" id="panel-${p}" style="display:${p===activeTab?'block':'none'}">
-      <textarea id="ta-${p}" style="width:100%; height:120px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:13px;" placeholder="${p} 뉴스 기사 전문을 붙여넣으세요."></textarea>
+      <textarea id="ta-${p}" style="width:100%; height:100px; margin-bottom:15px; padding:12px; border-radius:8px; border:1px solid #ddd; font-size:13px;" placeholder="${p} 뉴스 기사를 붙여넣으세요."></textarea>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:15px;">
         <div><label style="font-size:11px; font-weight:700; color:#666;">가격</label><input type="number" id="f-price-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
         <div><label style="font-size:11px; font-weight:700; color:#666;">변동률(%)</label><input type="number" id="f-pct-${p}" step="0.01" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"></div>
-        <div><label style="font-size:11px; font-weight:700; color:red;">날짜(필수)</label><input type="date" id="f-date-${p}" style="width:100%; padding:7px; border:1px solid red; border-radius:5px;"></div>
+        <div><label style="font-size:11px; font-weight:700; color:red;">기준일</label><input type="date" id="f-date-${p}" style="width:100%; padding:7px; border:1.5px solid red; border-radius:5px;"></div>
       </div>
       <div style="margin-bottom:15px;"><label style="font-size:11px; font-weight:700;">시장판정</label><select id="f-dir-${p}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:5px;"><option>상승</option><option>하락</option><option>보합</option></select></div>
-      <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700;">코멘터리 (상단 노란박스)</label><textarea id="f-co-${p}" style="width:100%; height:60px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
-      <div><label style="font-size:11px; font-weight:700;">변동요인 (하단 노란박스 - 한 줄에 한 요인씩)</label><textarea id="f-fa-${p}" style="width:100%; height:150px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
+      <div style="margin-bottom:15px;"><label style="font-size:11px; font-weight:700;">코멘터리</label><textarea id="f-co-${p}" style="width:100%; height:80px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
+      <div><label style="font-size:11px; font-weight:700;">변동요인 및 전망</label><textarea id="f-fa-${p}" style="width:100%; height:200px; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea></div>
     </div>`).join('');
 }
 
@@ -214,36 +210,33 @@ function renderCard(prod,entry,date){
   const cls=PCLS[prod];
   if(!entry) return `<div class="p-card"><div class="card-bar ${cls}"></div><div style="padding:50px; text-align:center; color:#999;">데이터 없음</div></div>`;
   const dir=entry.direction==='상승'?'up':entry.direction==='하락'?'dn':'flt';
+  const eJSON=encodeURIComponent(JSON.stringify(entry));
   
   return `<div class="p-card">
     <div class="card-bar ${cls}"></div>
     <div class="card-hdr">
       <div class="card-prod ${cls}">${prod}</div>
       <div class="card-acts">
-        <button class="c-btn" style="border:none; cursor:pointer; background:none; font-size:16px;" onclick='openModal("${prod}","${date}",${JSON.stringify(entry)})'>✎</button>
-        <button class="c-btn" style="border:none; cursor:pointer; background:none; font-size:16px; color:red;" onclick="delEntry('${prod}','${date}')">&times;</button>
+        <button style="border:none; cursor:pointer; background:none; font-size:18px;" onclick='openModal("${prod}","${date}",JSON.parse(decodeURIComponent("${eJSON}")))'>✎</button>
+        <button style="border:none; cursor:pointer; background:none; font-size:18px; color:red;" onclick="delEntry('${prod}','${date}')">&times;</button>
       </div>
     </div>
     <div class="card-price">
       <div class="p-val ${dir}">${entry.price.toFixed(2)}</div>
       <div class="p-delta ${dir}">${(entry.changePct>=0?'+':'')+entry.changePct.toFixed(2)}%</div>
     </div>
-    <div style="padding:0 18px 15px;"><span class="dir-badge ${dir}">${entry.direction}</span></div>
+    <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
     
-    <div class="highlight-box">
-      <span class="sec-lbl-custom">COMMENTARY</span>
-      <div class="sec-txt-custom">${entry.commentary}</div>
-    </div>
+    <div class="section-label-box"><span class="section-label-text">COMMENTARY</span></div>
+    <div class="section-body-text">${entry.commentary}</div>
     
-    <div class="highlight-box" style="margin-top:0;">
-      <span class="sec-lbl-custom">MARKET FACTORS</span>
-      <div class="sec-txt-custom">${entry.factors}</div>
-    </div>
+    <div class="section-label-box"><span class="section-label-text">MARKET FACTORS</span></div>
+    <div class="section-body-text">${entry.factors}</div>
   </div>`;
 }
 
 function buildArc(){
-  document.getElementById('arc-list').innerHTML=allDates.slice(0,15).map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')"><span>${d}</span><span>&rsaquo;</span></div>`).join('');
+  document.getElementById('arc-list').innerHTML=allDates.slice(0,12).map(d=>`<div class="arc-item ${d===curDate?'active':''}" onclick="renderDate('${d}')"><span>${d}</span><span>&rsaquo;</span></div>`).join('');
 }
 
 function moveDate(offset){
@@ -255,7 +248,10 @@ function moveDate(offset){
 function openModal(prod,date,entry){
   document.getElementById('overlay').classList.add('open');
   if(prod) switchTab(prod);
+  
+  // 편집(Edit) 모드: 기존 내용 채우기
   if(entry && prod){
+    document.getElementById('modal-title').textContent = 'EDIT BRIEFING ENTRY';
     document.getElementById(`f-price-${prod}`).value=entry.price;
     document.getElementById(`f-pct-${prod}`).value=entry.changePct;
     document.getElementById(`f-date-${prod}`).value=entry.date.replace(/\./g,'-');
@@ -263,6 +259,7 @@ function openModal(prod,date,entry){
     document.getElementById(`f-co-${prod}`).value=entry.commentary;
     document.getElementById(`f-fa-${prod}`).value=entry.factors;
   } else {
+    document.getElementById('modal-title').textContent = 'NEW BRIEFING ENTRY';
     const today = new Date().toISOString().split('T')[0];
     PRODS.forEach(p => { if(!document.getElementById(`f-date-${p}`).value) document.getElementById(`f-date-${p}`).value = today; });
   }
@@ -276,7 +273,7 @@ function switchTab(p){
 }
 
 async function doSaveAll(){
-  const info = document.getElementById('m-info'); info.textContent = "구글 시트에 저장 중...";
+  const info = document.getElementById('m-info'); info.textContent = "구글 시트에 업데이트 중...";
   let count = 0;
   for(const p of PRODS){
     const price = document.getElementById(`f-price-${p}`).value;
@@ -294,27 +291,26 @@ async function doSaveAll(){
       try { await fetch(GAS, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({action:'save', sheet:p, data}) }); count++; } catch(e){}
     }
   }
-  if(count > 0){ toast(`✅ ${count}개 품목 저장 성공`, 'ok'); closeModal(); loadData(); }
+  if(count > 0){ toast(`✅ ${count}개 품목 반영 성공`, 'ok'); closeModal(); loadData(); }
 }
 
 async function delEntry(prod,date){
   if(!confirm(`[${prod}] ${date} 데이터를 삭제하시겠습니까?`))return;
-  try{ const r=await fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action:'delete', sheet:prod, rowKey:{date}})}); toast('🗑 삭제 완료', 'ok'); loadData(); } catch(e){}
+  try{ await fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action:'delete', sheet:prod, rowKey:{date}})}); toast('🗑 삭제 완료', 'ok'); loadData(); } catch(e){}
 }
 
 function doParse(){
   const p=activeTab, txt=document.getElementById(`ta-${p}`).value.trim();
   if(!txt) return;
 
-  // 가격/변동률 파싱
   const priceM = txt.match(/배럴당\s*([\d,.]+)\s*달러/) || txt.match(/CFR\s*China[^\n]*?\$\s*([\d,.]+)/i) || txt.match(/FOB\s*Korea[^\n]*?\$\s*([\d,.]+)/i);
   if(priceM) document.getElementById(`f-price-${p}`).value = priceM[1].replace(/,/g,'');
   const pctM = txt.match(/\(([\d.+-]+)%\)/);
   if(pctM) document.getElementById(`f-pct-${p}`).value = pctM[1];
+  
   if(txt.includes('상승') || txt.includes('▲')) document.getElementById(`f-dir-${p}`).value = '상승';
   else if(txt.includes('하락') || txt.includes('▼')) document.getElementById(`f-dir-${p}`).value = '하락';
 
-  // 날짜 파싱
   const dateM = txt.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일/) || txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
   if(dateM) document.getElementById(`f-date-${p}`).value = `${dateM[1]}-${dateM[2].padStart(2,'0')}-${dateM[3].padStart(2,'0')}`;
   else {
@@ -322,16 +318,13 @@ function doParse(){
     if(lcM) { const now = new Date(); let d = new Date(now.getFullYear(), now.getMonth(), parseInt(lcM[1]) + 1); document.getElementById(`f-date-${p}`).value = d.toISOString().split('T')[0]; }
   }
 
-  // ⭐️ 변동요인 줄바꿈 처리 로직 ⭐️
-  // 슬래시(/)나 불렛(*) 기호를 줄바꿈으로 변환하여 가독성 증대
+  // 줄바꿈 보강 파싱
   let factorText = txt.split(/[.\n]/).filter(s => s.length > 20).slice(0, 5).join('.\n\n');
-  // 이미 요인별로 구분된 텍스트가 있다면 슬래시를 줄바꿈으로 변경
   if(txt.includes('**')) { 
      factorText = txt.split('**').filter(s => s.trim().length > 5).map(s => '• ' + s.replace(/\//g, '').trim()).join('\n\n');
   }
   document.getElementById(`f-fa-${p}`).value = factorText;
-  
-  toast(`${p} 파싱 완료! 노란 박스 내용을 확인하세요.`, 'ok');
+  toast(`${p} 파싱 완료`, 'ok');
 }
 
 function toast(m,t){const e=document.getElementById('toast'); e.textContent=m; e.className='show '+t; e.style.background=(t==='ok'?'#065F46':'#991B1B'); setTimeout(()=>e.className='',3000);}
@@ -342,8 +335,6 @@ function dlImage(){
     const a = document.createElement('a'); a.href=canvas.toDataURL(); a.download=`DailyBrief_${curDate}.png`; a.click();
   });
 }
-
-function dlPDF(){ window.print(); }
 
 buildPanels();
 loadData();
