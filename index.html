@@ -405,7 +405,7 @@ async function doSaveAll(){
     const isEdit=editMode.sheet===p;
     const data={
       date:fmtDate(date),price,
-      change:parseFloat(document.getElementById('f-change-'+p).value)||null,
+      change:(document.getElementById('f-change-'+p).value!==''?parseFloat(document.getElementById('f-change-'+p).value):null),
       changePct:parseFloat(document.getElementById('f-pct-'+p).value)||0,
       direction:document.getElementById('f-dir-'+p).value,
       commentary:document.getElementById('f-co-'+p).value.trim(),
