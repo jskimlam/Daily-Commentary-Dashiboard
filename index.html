@@ -8,7 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-/* pip install 필요 없음 (CDN 방식) */
+/* 라이브러리 설치: pip install (해당 없음, CDN 방식 사용) */
+
 :root {
   --up:#DC2626; --dn:#1D4ED8; --flt:#111827;
   --up-bg:#FEF2F2; --dn-bg:#EFF6FF; --flt-bg:#F9FAFB;
@@ -21,7 +22,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* 헤더 */
+/* 헤더 디자인 */
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;flex-shrink:0;}
@@ -30,7 +31,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .hdr-title span { color: var(--lotte); }
 .copyright-text { font-family: var(--sans); font-size: 13px; font-weight: 800; color: #000 !important; margin-left: 14px; border-left: 2.5px solid #000; padding-left: 14px; white-space: nowrap;}
 
-/* 비밀번호 모달 */
+/* 🔐 마스킹 비밀번호 모달 */
 #pw-overlay { position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
 #pw-modal { background:white; padding:30px; border-radius:15px; text-align:center; width:320px; border:3px solid #000; box-shadow:0 20px 40px rgba(0,0,0,0.4); }
 #pw-input { width:100%; padding:12px; font-size:28px; text-align:center; letter-spacing:12px; border:2px solid #000; border-radius:8px; margin:20px 0; outline:none; }
@@ -44,9 +45,10 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .btn-primary{background:var(--lotte);color:#fff;}
 .btn-outline{background:var(--white);color:var(--g2);border:1px solid var(--bd);}
 
-/* 메인 */
+/* 메인 레이아웃 */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
 .sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+
 .arc-select-wrap { position: relative; width: 100%; }
 .arc-select-btn { width: 100%; padding: 12px 15px; background: var(--white); border: 2px solid #000; border-radius: 8px; font-family: var(--mono); font-size: 14px; font-weight: 700; color: #000; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--sh); }
 .arc-dropdown { position: absolute; top: 105%; left: 0; width: 100%; max-height: 400px; overflow-y: auto; background: var(--white); border: 2px solid #000; border-radius: 8px; z-index: 1000; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -63,6 +65,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .card-hdr{padding:16px 18px 10px;display:flex;justify-content:space-between;align-items:center;}
 .card-prod{font-family:var(--disp);font-size:22px;font-weight:900;}
 
+/* 가격 및 전일대비 표시 보정 */
 .card-price{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between;}
 .p-val{font-family:var(--disp);font-size:46px;font-weight:900;line-height:1;}
 .p-val.up{color:var(--up);}.p-val.dn{color:var(--dn);}.p-val.flt{color:var(--flt);}
@@ -73,6 +76,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .dir-badge{display:inline-block;padding:6px 16px;border-radius:30px;font-size:15px;font-weight:900;border:2px solid black;margin-bottom:15px;margin-left:18px;}
 .dir-badge.up{background:var(--up);color:white;}.dir-badge.dn{background:var(--dn);color:white;}.dir-badge.flt{background:var(--g3);color:white;}
 
+/* 섹션 타이틀 및 본문 */
 .section-label-box { display: inline-block; background-color: var(--highlight-bg); border: 2px solid #000; padding: 4px 12px; margin: 15px 18px 8px; border-radius: 4px; }
 .section-label-text { font-family: var(--mono); font-size: 12px; font-weight: 900; color: #000; text-transform: uppercase; }
 .section-body-text { padding: 0 18px 18px; font-size: 16px; line-height: 1.65; color: #000; white-space: pre-wrap; word-break: keep-all; }
@@ -153,10 +157,10 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       <button onclick="closeModal()" style="background:none; border:none; cursor:pointer; font-size:28px;">&times;</button>
     </div>
     <div style="display:flex; border-bottom:1px solid #eee; overflow-x:auto;">
-      <button class="m-tab active" onclick="switchTab('WTI')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">WTI</button>
-      <button class="m-tab" onclick="switchTab('Styrene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Styrene</button>
-      <button class="m-tab" onclick="switchTab('Benzene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Benzene</button>
-      <button class="m-tab" onclick="switchTab('Butadiene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:800;">Butadiene</button>
+      <button class="m-tab active" onclick="switchTab('WTI')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:700;">WTI</button>
+      <button class="m-tab" onclick="switchTab('Styrene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:700;">Styrene</button>
+      <button class="m-tab" onclick="switchTab('Benzene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:700;">Benzene</button>
+      <button class="m-tab" onclick="switchTab('Butadiene')" style="flex:1; padding:15px; border:none; background:none; cursor:pointer; font-weight:700;">Butadiene</button>
     </div>
     <div id="tab-panels" style="flex:1; overflow-y:auto; padding:20px;"></div>
     <div style="padding:15px 20px; background:#f9fafb; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px;">
@@ -168,12 +172,14 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
+// 사용자 Google Apps Script URL
 const GAS='https://script.google.com/macros/s/AKfycbxZMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
 let allData={}, allDates=[], curDate='', activeTab='WTI';
 let pwCallback = null;
 
+// 🔐 관리자 인증 시스템 (0111)
 function reqAdmin(type, p1, p2, p3) {
   document.getElementById('pw-overlay').style.display = 'flex';
   document.getElementById('pw-input').value = '';
@@ -256,10 +262,13 @@ function renderCard(prod,entry,date){
       </div>
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
+    
     <div class="section-label-box"><span class="section-label-text">COMMENTARY</span></div>
     <div class="section-body-text text-bold">${entry.commentary}</div>
+    
     <div class="section-label-box"><span class="section-label-text">MARKET FACTORS</span></div>
     <div class="section-body-text text-normal">${entry.factors}</div>
+
     <div class="section-label-box"><span class="section-label-text">CONCLUSION & OUTLOOK</span></div>
     <div class="section-body-text text-normal">${entry.outlook || '-'}</div>
   </div>`;
@@ -321,48 +330,63 @@ async function delEntry(prod,date){
   try{ await fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify({action:'delete', sheet:prod, rowKey:{date}})}); toast('🗑 삭제 완료', 'ok'); loadData(); } catch(e){}
 }
 
+// ⭐️ 강화된 정밀 파싱 엔진
 function doParse(){
   const p=activeTab, txt=document.getElementById(`ta-${p}`).value.trim();
   if(!txt) return;
+
   const f = {};
   
-  // 1) 가격 파싱
-  const priceM = txt.match(/1\)\s*가격[^\n]*\n(?:[^\n]*\n)?.*:?\s*\$([\d,.]+)\/([^\s\()]+)/i);
-  if(priceM) {
-    f.price = parseFloat(priceM[1].replace(/,/g,''));
-    const changeM = txt.match(/\(([▼▲])\s*\$([\d,.]+)[^,]*,\s*([+-]?[\d,.]+)%\)/i);
+  // 1) 날짜 추출
+  const dateM = txt.match(/\((\d{4})-(\d{2})-(\d{2})\)/) || txt.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(dateM) f.dateStr = `${dateM[1]}-${dateM[2]}-${dateM[3]}`;
+
+  // 2) 가격 및 전일대비 파싱 (1. 가격 섹션)
+  const priceSection = txt.match(/1\.\s*가격[^\n]*\n([\s\S]*?)(?=\n2\.\s*|$)/);
+  if(priceSection) {
+    const lines = priceSection[1].split('\n');
+    // SM CFR China 라인 또는 달러 표시 라인 찾기
+    const line = lines.find(l => l.includes('$')) || '';
+    const pM = line.match(/\$([\d,.]+)/);
+    if(pM) f.price = parseFloat(pM[1].replace(/,/g,''));
+    
+    // 전일 대비 금액 ($0 또는 $3.30 등)
+    const changeM = line.match(/전일\s*대비\s*([+-]?)\$([\d,.]+)/);
     if(changeM) {
-      f.change = (changeM[1] === '▼' ? -1 : 1) * parseFloat(changeM[2]);
-      f.pct = parseFloat(changeM[3]);
-      f.direction = changeM[1] === '▲' ? '상승' : '하락';
-    } else if(txt.includes('변동없음') || txt.includes('보합')) {
-      f.change = 0; f.pct = 0; f.direction = '보합';
+      const sign = changeM[1] === '-' ? -1 : 1;
+      f.change = sign * parseFloat(changeM[2].replace(/,/g,''));
     }
+
+    // 판정
+    if(line.includes('보합') || line.includes('변동없음')) f.direction = '보합';
+    else if(line.includes('상승') || line.includes('▲')) f.direction = '상승';
+    else if(line.includes('하락') || line.includes('▼')) f.direction = '하락';
   }
 
-  // 2) 코멘터리 (유연하게 수정)
-  const commM = txt.match(/가격\s*변동\s*요인\s*한줄[^\n]*\n([^\n]+)/);
+  // 3) 코멘터리 (2. 코멘터리 섹션)
+  const commM = txt.match(/2\.\s*코멘터리[^\n]*\n([^\n]+)/);
   if(commM) f.commentary = commM[1].trim();
 
-  // 3) 변동요인
-  const factorsM = txt.match(/변동요인\s*구체\s*리스트[^\n]*\n([\s\S]*?)(?=\n\d+\)|$)/);
+  // 4) 변동요인 (3. 변동요인 섹션)
+  const factorsM = txt.match(/3\.\s*변동요인[^\n]*\n([\s\S]*?)(?=\n4\.\s*|$)/);
   if(factorsM) {
     f.factors = factorsM[1].split('\n').map(s => s.trim()).filter(s => s.length > 2).map(s => '• ' + s.replace(/^[•\-\*]\s*/, '')).join('\n');
   }
 
-  // 4) 결론 및 전망 (유연하게 수정)
-  const outlookM = txt.match(/결론\s*및\s*전망[^\n]*\n([^\n]+)/);
+  // 5) 결론 및 전망 (4. 결론 및 전망 섹션)
+  const outlookM = txt.match(/4\.\s*결론\s*및\s*전망[^\n]*\n([^\n]+)/);
   if(outlookM) f.outlook = outlookM[1].trim();
 
+  // 입력 필드 반영
   if(f.price) document.getElementById(`f-price-${p}`).value = f.price;
   if(f.change !== undefined) document.getElementById(`f-change-${p}`).value = f.change;
-  if(f.pct !== undefined) document.getElementById(`f-pct-${p}`).value = f.pct;
+  if(f.dateStr) document.getElementById(`f-date-${p}`).value = f.dateStr;
   if(f.direction) document.getElementById(`f-dir-${p}`).value = f.direction;
   if(f.commentary) document.getElementById(`f-co-${p}`).value = f.commentary;
   if(f.factors) document.getElementById(`f-fa-${p}`).value = f.factors;
   if(f.outlook) document.getElementById(`f-ou-${p}`).value = f.outlook;
   
-  toast(`${p} 파싱 완료`, 'ok');
+  toast(`${p} 정밀 파싱 완료`, 'ok');
 }
 
 function toast(m,t){const e=document.getElementById('toast'); e.textContent=m; e.className='show '+t; e.style.background=(t==='ok'?'#065F46':'#991B1B'); setTimeout(()=>e.className='',3000);}
