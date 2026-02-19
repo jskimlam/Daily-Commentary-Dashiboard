@@ -123,6 +123,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 #toast.show{opacity:1;}
 
 /* ── 반응형 ── */
+/* ── 모바일 (갤럭시 S25 등) ── */
 @media(max-width:480px){
   .hdr-inner{height:auto;flex-direction:column;padding:15px 16px;gap:15px;}
   .copyright-text{display:block;border-left:none;padding-left:0;margin-left:0;margin-top:5px;font-size:11px;text-align:center;}
@@ -130,8 +131,25 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .layout{padding:16px 12px;flex-direction:column;}
   .sidebar{width:100%;}
   .grid4{grid-template-columns:1fr;}
+  .p-val{font-size:36px;}
 }
-@media(min-width:481px) and (max-width:1024px){.grid4{grid-template-columns:1fr 1fr;}}
+/* ── 태블릿 / 폴드 접힌 화면 ── */
+@media(min-width:481px) and (max-width:1024px){
+  .grid4{grid-template-columns:1fr 1fr;}
+  .layout{padding:20px 20px;}
+  .sidebar{width:200px;}
+}
+/* ── 폴드7 펼친 화면 (1812px 내부 디스플레이) ── */
+@media(min-width:1025px) and (max-width:1920px){
+  .hdr-inner{padding:0 24px;}
+  .layout{padding:20px 24px 80px;}
+  .grid4{grid-template-columns:repeat(4,1fr);gap:14px;}
+  .sidebar{width:220px;}
+  .p-val{font-size:40px;}
+  .card-prod{font-size:20px;}
+  .section-body-text{font-size:14px;}
+  .wk-table{font-size:12px;}
+}
 </style>
 </head>
 <body>
@@ -281,7 +299,10 @@ function renderCard(prod,entry,date){
     </div>
     <div class="card-price">
       <div class="p-val ${dir}">${entry.price.toFixed(2)}</div>
-      <div class="d-abs ${dir}">${as}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="d-abs ${dir}">${as}</div>
+        <div class="d-abs ${dir}" style="font-size:14px;">${ps}${entry.changePct.toFixed(2)}%</div>
+      </div>
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
     ${entry.commentary?`<div class="section-label-box"><span class="section-label-text">Commentary</span></div>
