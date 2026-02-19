@@ -487,13 +487,21 @@ function parseBriefing(txt, prod){
   let m=clean.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
   if(m)f.dateStr=m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');
 
-  // ── 섹션 추출 헬퍼: 제목 키워드로 섹션 찾기 ──
-  // 다음 "N)" 로 시작하는 라인 전까지 반환
+  // ── 섹션 번호 기반 추출 (N) 시작 ~ 다음 N+1) 전까지) ──
+  function secByNum(num){
+    const re=new RegExp('^\\s*'+num+'\\)');
+    const si=lines.findIndex(l=>re.test(l.trim()));
+    if(si<0)return[];
+    const ei=lines.findIndex((l,i)=>i>si&&/^\s*\d+\)/.test(l.trim()));
+    return lines.slice(si+1,ei<0?undefined:ei);
+  }
+
+  // ── 키워드 기반 추출 (제목에 키워드 포함 섹션) ──
   function secByKeyword(keyword){
     const si=lines.findIndex(l=>l.includes(keyword));
     if(si<0)return[];
-    const ei=lines.findIndex((l,i)=>i>si&&/^\s*\d+\)/.test(l));
-    return lines.slice(si+1, ei<0?undefined:ei);
+    const ei=lines.findIndex((l,i)=>i>si&&/^\s*\d+\)/.test(l.trim()));
+    return lines.slice(si+1,ei<0?undefined:ei);
   }
 
   // 불릿 항목 추출
@@ -506,24 +514,16 @@ function parseBriefing(txt, prod){
   }
 
   // ── 가격 파싱: 섹션 1) 에서만 추출 ──
-  // 섹션 1) 시작 ~ 다음 섹션 전까지
-  const s1start=lines.findIndex(l=>/^\s*1\)/.test(l.trim()));
-  const s1end  =lines.findIndex((l,i)=>i>s1start&&/^\s*\d+\)/.test(l.trim()));
-  const sec1   =lines.slice(s1start+1, s1end<0?undefined:s1end);
-
+  const sec1=secByNum(1);
   const keyword=prod==='Benzene'?'FOB Korea':'CFR China';
   const priceLine=sec1.find(l=>l.includes(keyword));
 
   if(priceLine){
-    // 가격: $1,270/mt 또는 $944/mt
     const pm=priceLine.match(/\$\s*([\d,]+(?:\.\d+)?)\/mt/i);
     if(pm)f.price=parseFloat(pm[1].replace(/,/g,''));
-    // 변동: ▼/▲ $X/mt
     const cm=priceLine.match(/([▼▲])\s*\$([\d.]+)\/mt/);
     if(cm)f.change=cm[1]==='▼'?-parseFloat(cm[2]):parseFloat(cm[2]);
-    // 변동없음
     if(!cm&&/변동없음|unchanged/i.test(priceLine))f.change=0;
-    // 방향: → 텍스트 우선
     const dm=priceLine.match(/→\s*(상승|하락|보합)/);
     f.dir=dm?dm[1]:null;
   }
@@ -534,13 +534,14 @@ function parseBriefing(txt, prod){
       ?parseFloat((f.change/(f.price-f.change)*100).toFixed(2)):0);
   }
 
-  // 방향 보완 (텍스트 없을 때)
+  // 방향 보완
   if(!f.dir){
     f.dir=f.change===0?'보합':(f.pct||0)>0?'상승':(f.pct||0)<0?'하락':'보합';
   }
 
-  // ── 코멘터리: "가격 변동 요인 한줄" 키워드 섹션 첫 번째 불릿 ──
-  const b3=bullets(secByKeyword('가격 변동 요인'));
+  // ── 코멘터리: 섹션 3) 첫 번째 불릿 (키워드 fallback) ──
+  let b3=bullets(secByNum(3));
+  if(b3.length===0)b3=bullets(secByKeyword('가격 변동 요인'));
   if(b3.length>0)f.commentary=b3[0];
   if(!f.commentary&&f.price!=null){
     const ps=(f.pct||0)>=0?'+':'';
@@ -549,13 +550,21 @@ function parseBriefing(txt, prod){
     f.commentary=`${prod}${label}는 ${as}${ps}${(f.pct||0).toFixed(2)}% 변동하여 톤당 $${f.price.toFixed(0)}에 ${f.dir} 마감했다.`;
   }
 
-  // ── 변동요인: "변동요인 구체" 키워드 섹션 불릿 전체 ──
-  const b4=bullets(secByKeyword('변동요인 구체'));
-  if(b4.length>0)f.factors=b4.join(' / ');
+  // ── 변동요인: 섹션 4) 불릿 전체 (키워드 fallback) ──
+  let b4=bullets(secByNum(4));
+  if(b4.length===0)b4=bullets(secByKeyword('변동요인 구체'));
+  if(b4.length>0)f.factors=b4.join('\n');
 
-  // ── 결론전망: "결론 및 전망" 키워드 섹션 첫 번째 불릿 ──
-  const b5=bullets(secByKeyword('결론 및 전망'));
-  if(b5.length>0)f.outlook=b5[0];
+  // ── 결론전망: 마지막 섹션 첫 번째 불릿 (키워드 우선) ──
+  // "결론 및 전망" 키워드로 먼저 찾고, 없으면 마지막 섹션 번호
+  let b6=bullets(secByKeyword('결론 및 전망'));
+  if(b6.length===0){
+    // 마지막 섹션 번호 찾기 (6이든 5이든)
+    const secNums=[...clean.matchAll(/^\s*(\d+)\)/gm)].map(x=>parseInt(x[1]));
+    const lastNum=secNums.length>0?Math.max(...secNums):5;
+    b6=bullets(secByNum(lastNum));
+  }
+  if(b6.length>0)f.outlook=b6[0];
 
   return f;
 }
