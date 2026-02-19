@@ -311,7 +311,7 @@ function renderCard(prod,entry,date){
     ${entry.factors?`<div class="section-label-box"><span class="section-label-text">Market Factors</span></div>
     <div class="section-body-text">${entry.factors.replace(/\n/g,'<br>')}</div>`:''}
     ${entry.outlook?`<div class="section-label-box"><span class="section-label-text">Outlook</span></div>
-    <div class="section-body-text">${entry.outlook}</div>`:''}
+    <div class="section-body-text">${entry.outlook.replace(/\n/g,'<br>')}</div>`:''}
   </div>`;
 }
 
