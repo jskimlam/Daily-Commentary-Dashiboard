@@ -28,6 +28,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .hdr-mark{width:50px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#000;border:2px solid #000;}
 .hdr-title{font-family:var(--disp);font-size:18px;font-weight:900;color:#000;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;}
 .hdr-title span{color:var(--lotte);}
+.hdr-title span.copyright-text{color:#000 !important;}
 .copyright-text{font-family:var(--sans);font-size:13px;font-weight:800;color:#000;margin-left:14px;border-left:2.5px solid #000;padding-left:14px;white-space:nowrap;}
 .hdr-center{display:flex;align-items:center;gap:8px;flex:1;justify-content:center;}
 .hdr-date-nav{display:flex;align-items:center;gap:6px;background:#f3f4f6;border-radius:8px;padding:6px 12px;border:1px solid var(--bd);}
@@ -219,7 +220,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 <div id="toast"></div>
 
 <script>
-const GAS='https://script.google.com/macros/s/AKfycbzqOZB4bllYuEKqi3K70MPAfVODnzJxbt6Hmkbpo1CvxodK12bK6B1X6bKPCGWbY57p/exec';
+const GAS='https://script.google.com/macros/s/AKfycbxZMMoEQyh8ADth6FhKyBPD-mPbfUX5XmjP9ShihM4plBtZQ9363uqmUXXCYXRXjyXB/exec';
 
 const PRODS=['WTI','Styrene','Benzene','Butadiene'];
 const PCLS={WTI:'wti',Styrene:'sm',Benzene:'bz',Butadiene:'bd'};
@@ -308,7 +309,7 @@ function renderCard(prod,entry,date){
     ${entry.commentary?`<div class="section-label-box"><span class="section-label-text">Commentary</span></div>
     <div class="section-body-text text-bold">${entry.commentary}</div>`:''}
     ${entry.factors?`<div class="section-label-box"><span class="section-label-text">Market Factors</span></div>
-    <div class="section-body-text">${entry.factors}</div>`:''}
+    <div class="section-body-text">${entry.factors.replace(/\n/g,'<br>')}</div>`:''}
     ${entry.outlook?`<div class="section-label-box"><span class="section-label-text">Outlook</span></div>
     <div class="section-body-text">${entry.outlook}</div>`:''}
   </div>`;
