@@ -44,7 +44,17 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 
 /* ── 레이아웃 ── */
 .layout{max-width:1600px;margin:0 auto;padding:24px 32px 80px;display:flex;gap:20px;}
-.sidebar{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+.sidebar{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
+.mini-wk-wrap{background:var(--white);border:1px solid var(--bd);border-radius:10px;padding:10px 8px;margin-top:4px;}
+.mini-wk-title{font-size:10px;font-weight:800;color:var(--g3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.mini-wk-table{width:100%;border-collapse:collapse;font-size:10px;}
+.mini-wk-table th{font-size:9px;color:var(--g4);background:var(--g7);padding:3px 4px;text-align:center;border-bottom:1px solid var(--bd);font-weight:600;white-space:nowrap;}
+.mini-wk-table th:first-child{text-align:left;}
+.mini-wk-table td{padding:3px 4px;text-align:center;border-bottom:1px solid var(--g6);font-family:var(--mono);font-size:9px;color:var(--g2);white-space:nowrap;}
+.mini-wk-table td:first-child{text-align:left;font-weight:700;font-size:9px;color:var(--g1);}
+.mini-wk-table td.wt-up{color:var(--up)!important;font-weight:700;}
+.mini-wk-table td.wt-dn{color:var(--dn)!important;font-weight:700;}
+.mini-wk-table td.wt-flt{color:var(--flt)!important;font-weight:700;}
 .main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 
@@ -210,6 +220,10 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
       <button class="arc-select-btn" id="arc-selected-label" onclick="toggleArc()">날짜 선택</button>
       <div class="arc-dropdown" id="arc-dropdown"></div>
     </div>
+    <div class="mini-wk-wrap">
+      <div class="mini-wk-title">📊 주간 요약 <span id="mini-wk-label" style="font-size:9px;color:#6b7280;"></span></div>
+      <table class="mini-wk-table"><thead><tr id="mini-wk-thead"></tr></thead><tbody id="mini-wk-tbody"></tbody></table>
+    </div>
   </aside>
 
   <main class="main">
@@ -288,6 +302,7 @@ function selDate(d){
   document.getElementById('grid').innerHTML=PRODS.map(p=>renderCard(p,(allData[p]||[]).find(e=>e.date===d),d)).join('');
   buildArc();
   buildWkTable();
+  buildMiniWkTable();
 }
 
 // ── 데이터 로드 ──
@@ -301,6 +316,7 @@ async function loadData(){
     if(!curDate&&allDates.length>0)curDate=allDates[0];
     if(curDate)selDate(curDate);
     buildWkTable();
+    buildMiniWkTable();
   }catch(e){toast('❌ 데이터 로드 실패: '+e.message,'err');}
 }
 
@@ -403,6 +419,39 @@ function buildWkTable(){
       return`<td class="wt-${dir}">${e.price.toFixed(1)}<br><span style="font-size:10px;">${e.changePct>=0?'+':''}${e.changePct.toFixed(1)}%</span></td>`;
     });
     return`<tr><td>${p}</td>${cells.join('')}</tr>`;
+  }).join('');
+}
+
+// ── 사이드바 미니 주간 테이블 (전치: 날짜 6행 × 품목 4열) ──
+function buildMiniWkTable(){
+  const thead=document.getElementById('mini-wk-thead');
+  const tbody=document.getElementById('mini-wk-tbody');
+  if(!thead||!tbody)return;
+
+  const base=curDate||allDates[0]||'';
+  if(!base){thead.innerHTML='';tbody.innerHTML='';return;}
+
+  const{cols,weekLabel,from,to}=getWeekColumns(base);
+
+  // 타이틀 업데이트
+  const labelEl=document.getElementById('mini-wk-label');
+  if(labelEl)labelEl.textContent=weekLabel;
+
+  // 헤더: 품목명 4개
+  thead.innerHTML='<th>날짜</th>'+PRODS.map(p=>`<th>${p==='Butadiene'?'BD':p==='Styrene'?'SM':p==='Benzene'?'BZ':p}</th>`).join('');
+
+  // 바디: 날짜 6행, 각 행에 품목별 가격+변동률
+  tbody.innerHTML=cols.map(d=>{
+    const cells=PRODS.map(p=>{
+      const e=(allData[p]||[]).find(x=>x.date===d);
+      if(!e)return'<td style="color:#ccc;">—</td>';
+      const dir=e.changePct>0?'up':e.changePct<0?'dn':'flt';
+      return`<td class="wt-${dir}">${e.price.toFixed(0)}<br><span style="font-size:8px;">${e.changePct>=0?'+':''}${e.changePct.toFixed(1)}%</span></td>`;
+    });
+    // 전주금 강조 표시
+    const isFirst=d===cols[0];
+    const dateLabel=d.slice(5);
+    return`<tr${isFirst?' style="background:var(--g7);"':''}><td style="font-size:9px;${isFirst?'font-weight:900;':''}">${dateLabel}</td>${cells.join('')}</tr>`;
   }).join('');
 }
 
