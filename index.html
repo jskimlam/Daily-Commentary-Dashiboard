@@ -342,22 +342,9 @@ function renderCard(prod,entry,date){
 }
 
 // ── 주간 테이블 ──
-// 선택 날짜 기준: 해당 주 금요일 ~ 전주 금요일 다음날(토) 범위 계산
-function getWeekRange(dateStr){
-  // dateStr: 'YYYY.MM.DD' 형식
-  const parts=dateStr.split('.');
-  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
-  const dow=d.getDay(); // 0=일,1=월,...,5=금,6=토
-  // 해당 주 금요일 (금=5 기준, 토/일이면 다음주 금요일로 보정)
-  const diffToFri=dow<=5?(5-dow):(5-dow+7);
-  const fri=new Date(d); fri.setDate(d.getDate()+diffToFri);
-  // 전주 금요일 = 해당 주 금요일 - 7일
-  const prevFri=new Date(fri); prevFri.setDate(fri.getDate()-7);
-  // 날짜 → 'YYYY.MM.DD' 포맷
-  function fmt(dt){
-    return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');
-  }
-  return{from:fmt(prevFri), to:fmt(fri), weekLabel:getISOWeek(fri)};
+// 날짜 → 'YYYY.MM.DD' 포맷 헬퍼
+function fmtD(dt){
+  return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');
 }
 // ISO 주차 계산
 function getISOWeek(dt){
@@ -365,6 +352,27 @@ function getISOWeek(dt){
   d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));
   const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
   return'W'+String(Math.ceil((((d-yearStart)/86400000)+1)/7)).padStart(2,'0');
+}
+// 선택 날짜 기준 주간 날짜 컬럼 생성: 전주금(1) + 당주 월~금(5) = 6개 평일 고정
+function getWeekColumns(dateStr){
+  const parts=dateStr.split('.');
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  const dow=d.getDay(); // 0=일,1=월,...,5=금,6=토
+  // 해당 주 금요일 계산 (토=6이면 다음주 금요일)
+  const diffToFri=dow===6?6:(5-dow+7)%7;
+  const fri=new Date(d); fri.setDate(d.getDate()+diffToFri);
+  // 전주 금요일
+  const prevFri=new Date(fri); prevFri.setDate(fri.getDate()-7);
+  // 전주금 + 당주 월~금 = 6개 날짜 생성
+  const cols=[];
+  cols.push(fmtD(prevFri)); // 전주 금요일
+  // 당주 월요일 = 전주금 + 3일
+  const mon=new Date(prevFri); mon.setDate(prevFri.getDate()+3);
+  for(let i=0;i<5;i++){
+    const day=new Date(mon); day.setDate(mon.getDate()+i);
+    cols.push(fmtD(day)); // 월~금
+  }
+  return{cols, weekLabel:getISOWeek(fri), from:fmtD(prevFri), to:fmtD(fri)};
 }
 
 function buildWkTable(){
@@ -376,9 +384,8 @@ function buildWkTable(){
   const base=curDate||allDates[0]||'';
   let weekDates;
   if(base){
-    const{from,to,weekLabel}=getWeekRange(base);
-    // allDates 중 from < date <= to 범위만 필터 (전주금 초과 ~ 당주금 이하)
-    weekDates=allDates.filter(d=>d>from&&d<=to).sort((a,b)=>a.localeCompare(b));
+    const{cols,weekLabel,from,to}=getWeekColumns(base);
+    weekDates=cols; // 데이터 유무와 무관하게 6개 컬럼 고정
     // 주간 타이틀 업데이트
     const titleEl=document.getElementById('wk-label');
     if(titleEl)titleEl.textContent=weekLabel+' ('+from.slice(5)+' → '+to.slice(5)+')';
@@ -386,17 +393,11 @@ function buildWkTable(){
     weekDates=allDates.slice(0,7).reverse();
   }
 
-  if(weekDates.length===0){
-    thead.innerHTML='<th>품목</th>';
-    tbody.innerHTML=`<tr><td colspan="2" style="text-align:center;color:#999;">해당 주 데이터 없음</td></tr>`;
-    return;
-  }
-
   thead.innerHTML='<th>품목</th>'+weekDates.map(d=>`<th>${d.slice(5)}</th>`).join('');
   tbody.innerHTML=PRODS.map(p=>{
     const cells=weekDates.map(d=>{
       const e=(allData[p]||[]).find(x=>x.date===d);
-      if(!e)return'<td>—</td>';
+      if(!e)return'<td style="color:#ccc;">—</td>';
       const dir=e.direction==='상승'?'up':e.direction==='하락'?'dn':'flt';
       return`<td class="wt-${dir}">${e.price.toFixed(1)}<br><span style="font-size:10px;">${e.changePct>=0?'+':''}${e.changePct.toFixed(1)}%</span></td>`;
     });
