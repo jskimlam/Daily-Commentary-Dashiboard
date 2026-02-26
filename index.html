@@ -398,7 +398,8 @@ function buildWkTable(){
     const cells=weekDates.map(d=>{
       const e=(allData[p]||[]).find(x=>x.date===d);
       if(!e)return'<td style="color:#ccc;">—</td>';
-      const dir=e.direction==='상승'?'up':e.direction==='하락'?'dn':'flt';
+      // changePct 부호 기준으로 색상 결정: 양수=레드, 음수=블루, 0=검정
+      const dir=e.changePct>0?'up':e.changePct<0?'dn':'flt';
       return`<td class="wt-${dir}">${e.price.toFixed(1)}<br><span style="font-size:10px;">${e.changePct>=0?'+':''}${e.changePct.toFixed(1)}%</span></td>`;
     });
     return`<tr><td>${p}</td>${cells.join('')}</tr>`;
