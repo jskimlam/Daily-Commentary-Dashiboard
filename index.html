@@ -223,7 +223,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     </div>
     <div class="grid4" id="grid"></div>
     <div class="wk-wrap">
-      <div class="wk-title">📊 주간 가격 요약</div>
+      <div class="wk-title">📊 주간 가격 요약 <span id="wk-label" style="font-size:11px;color:#6b7280;margin-left:8px;"></span></div>
       <table class="wk-table"><thead><tr id="wk-thead"></tr></thead><tbody id="wk-tbody"></tbody></table>
     </div>
   </main>
@@ -342,14 +342,59 @@ function renderCard(prod,entry,date){
 }
 
 // ── 주간 테이블 ──
+// 선택 날짜 기준: 해당 주 금요일 ~ 전주 금요일 다음날(토) 범위 계산
+function getWeekRange(dateStr){
+  // dateStr: 'YYYY.MM.DD' 형식
+  const parts=dateStr.split('.');
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  const dow=d.getDay(); // 0=일,1=월,...,5=금,6=토
+  // 해당 주 금요일 (금=5 기준, 토/일이면 다음주 금요일로 보정)
+  const diffToFri=dow<=5?(5-dow):(5-dow+7);
+  const fri=new Date(d); fri.setDate(d.getDate()+diffToFri);
+  // 전주 금요일 = 해당 주 금요일 - 7일
+  const prevFri=new Date(fri); prevFri.setDate(fri.getDate()-7);
+  // 날짜 → 'YYYY.MM.DD' 포맷
+  function fmt(dt){
+    return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');
+  }
+  return{from:fmt(prevFri), to:fmt(fri), weekLabel:getISOWeek(fri)};
+}
+// ISO 주차 계산
+function getISOWeek(dt){
+  const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));
+  d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return'W'+String(Math.ceil((((d-yearStart)/86400000)+1)/7)).padStart(2,'0');
+}
+
 function buildWkTable(){
-  const recent=allDates.slice(0,7).reverse();
   const thead=document.getElementById('wk-thead');
   const tbody=document.getElementById('wk-tbody');
   if(!thead||!tbody)return;
-  thead.innerHTML='<th>품목</th>'+recent.map(d=>`<th>${d.slice(5)}</th>`).join('');
+
+  // 기준 날짜: curDate 없으면 allDates[0]
+  const base=curDate||allDates[0]||'';
+  let weekDates;
+  if(base){
+    const{from,to,weekLabel}=getWeekRange(base);
+    // allDates 중 from < date <= to 범위만 필터 (전주금 초과 ~ 당주금 이하)
+    weekDates=allDates.filter(d=>d>from&&d<=to).sort((a,b)=>a.localeCompare(b));
+    // 주간 타이틀 업데이트
+    const titleEl=document.getElementById('wk-label');
+    if(titleEl)titleEl.textContent=weekLabel+' ('+from.slice(5)+' → '+to.slice(5)+')';
+  } else {
+    weekDates=allDates.slice(0,7).reverse();
+  }
+
+  if(weekDates.length===0){
+    thead.innerHTML='<th>품목</th>';
+    tbody.innerHTML=`<tr><td colspan="2" style="text-align:center;color:#999;">해당 주 데이터 없음</td></tr>`;
+    return;
+  }
+
+  thead.innerHTML='<th>품목</th>'+weekDates.map(d=>`<th>${d.slice(5)}</th>`).join('');
   tbody.innerHTML=PRODS.map(p=>{
-    const cells=recent.map(d=>{
+    const cells=weekDates.map(d=>{
       const e=(allData[p]||[]).find(x=>x.date===d);
       if(!e)return'<td>—</td>';
       const dir=e.direction==='상승'?'up':e.direction==='하락'?'dn':'flt';
