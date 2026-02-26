@@ -564,20 +564,37 @@ function parseBriefing(txt, prod){
   const priceLine=sec1.find(l=>l.includes(keyword));
 
   if(priceLine){
-    // 가격: $944/mt
+    // ── 가격: $972.00/mt 또는 $65.42/b 형태
     const pm=priceLine.match(/\$([\d,]+(?:\.\d+)?)\/(?:mt|b)\b/i);
     if(pm)f.price=parseFloat(pm[1].replace(/,/g,''));
 
-    // 전일 대비: (전일 대비 $0) 또는 (전일 대비 +$9) 또는 (전일 대비 -$9)
-    const chgM=priceLine.match(/전일\s*대비\s*([+-]?)\$([\d.]+)/);
+    // ── 전일비 파싱 (3가지 패턴 순서대로 시도)
+    // 패턴1: 전일대비 +$3.00/mt 또는 전일대비 -$0.21/b  (SM, BZ, WTI)
+    let chgM=priceLine.match(/전일\s*대비\s*([+-])\$([\d.]+)/);
     if(chgM){
-      const sign=chgM[1]==='-'?-1:1;
-      f.change=sign*parseFloat(chgM[2]);
+      f.change=(chgM[1]==='-'?-1:1)*parseFloat(chgM[2]);
+    }
+    // 패턴2: 전일대비 0  (BD 보합, $기호 없이 숫자만)
+    if(f.change==null){
+      chgM=priceLine.match(/전일\s*대비\s*([+-]?)(\d+(?:\.\d+)?)[,\s]/);
+      if(chgM){
+        const sign=chgM[1]==='-'?-1:(chgM[1]==='+'?1:1);
+        f.change=sign*parseFloat(chgM[2]);
+      }
+    }
+    // 패턴3: 전일대비 0, 보합  (BD 0 단독 – 끝이 콤마/공백/문자열끝)
+    if(f.change==null){
+      chgM=priceLine.match(/전일\s*대비\s*([+-]?)(\d+(?:\.\d+)?)(?:[,\s]|$)/);
+      if(chgM){
+        const sign=chgM[1]==='-'?-1:(chgM[1]==='+'?1:1);
+        f.change=sign*parseFloat(chgM[2]);
+      }
     }
 
-    // 방향: → 보합/상승/하락
-    const dirM=priceLine.match(/→\s*(상승|하락|보합)/);
+    // ── 방향: 텍스트 명시 우선, 없으면 ← / → 기호로 판단
+    const dirM=priceLine.match(/(상승|하락|보합)/);
     if(dirM)f.dir=dirM[1];
+    else if(priceLine.includes('←'))f.dir='변동';  // ← 있으면 change 부호로 결정
   }
 
   // 변동률 계산
