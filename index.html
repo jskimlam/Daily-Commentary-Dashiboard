@@ -560,12 +560,12 @@ function parseBriefing(txt, prod){
 
   // ── 1. 가격 파싱 ──
   const sec1=getSection('가격');
-  const keyword=prod==='Benzene'?'FOB Korea':'CFR China';
+  const keyword=prod==='WTI'?'NYMEX':prod==='Benzene'?'FOB Korea':'CFR China';
   const priceLine=sec1.find(l=>l.includes(keyword));
 
   if(priceLine){
     // 가격: $944/mt
-    const pm=priceLine.match(/\$([\d,]+(?:\.\d+)?)\/mt/);
+    const pm=priceLine.match(/\$([\d,]+(?:\.\d+)?)\/(?:mt|b)\b/i);
     if(pm)f.price=parseFloat(pm[1].replace(/,/g,''));
 
     // 전일 대비: (전일 대비 $0) 또는 (전일 대비 +$9) 또는 (전일 대비 -$9)
@@ -613,7 +613,7 @@ function doParse(){
   if(!txt){showSt(p,'warn','텍스트 없음 — 수동 입력 모드');return;}
 
   // 제품별 파싱 분기
-  const f=p==='WTI'?parseWTI(txt):parseBriefing(txt,p);
+  const f=parseBriefing(txt,p);
 
   // 공통 필드 적용
   if(f.dateStr)document.getElementById(`f-date-${p}`).value=f.dateStr;
