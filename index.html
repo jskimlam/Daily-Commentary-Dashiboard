@@ -542,9 +542,13 @@ function parseBriefing(txt, prod){
     const si=lines.findIndex(l=>l.includes(keyword));
     if(si<0)return[];
     const result=[];
+    // 종료 트리거 키워드 목록
+    const stopWords=['결론 및 전망','기타 추가 정보','전문가 코멘트'];
     for(let i=si+1;i<lines.length;i++){
       // 숫자. 로 시작하는 다음 섹션이면 중단
       if(/^\d+\./.test(lines[i]))break;
+      // 종료 키워드 포함 라인이면 중단
+      if(stopWords.some(sw=>lines[i].includes(sw)))break;
       result.push(lines[i]);
     }
     return result;
