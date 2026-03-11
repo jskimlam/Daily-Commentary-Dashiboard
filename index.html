@@ -626,8 +626,8 @@ function parseBriefing(txt, prod){
   // ** 마크다운 볼드 제거 (있든 없든 동일하게 파싱)
   txt=txt.replace(/\*\*/g,'');
 
-  // 날짜: 제목 줄에서 (2026-02-19) 추출
-  const dm=txt.match(/(\d{4})[\-.\/](\d{1,2})[\-.\/](\d{1,2})/);
+  // 날짜: 본문 어디에 있든 YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD 허용
+  const dm=txt.match(/(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/);
   if(dm)f.dateStr=dm[1]+'-'+dm[2].padStart(2,'0')+'-'+dm[3].padStart(2,'0');
 
   // 라인 배열 (빈 줄 제거)
@@ -638,19 +638,15 @@ function parseBriefing(txt, prod){
     const si=lines.findIndex(l=>l.includes(keyword));
     if(si<0)return[];
     const result=[];
-    // 종료 트리거 키워드 목록
     const stopWords=['결론 및 전망','기타 추가 정보','전문가 코멘트'];
     for(let i=si+1;i<lines.length;i++){
-      // 숫자. 로 시작하는 다음 섹션이면 중단
       if(/^\d+\./.test(lines[i]))break;
-      // 종료 키워드 포함 라인이면 중단
       if(stopWords.some(sw=>lines[i].includes(sw)))break;
       result.push(lines[i]);
     }
     return result;
   }
 
-  // * 불릿 항목만 추출 (들여쓰기 포함)
   function getBullets(sectionLines){
     return sectionLines
       .filter(l=>l.startsWith('*') || l.startsWith('•') || l.startsWith('-'))
@@ -660,45 +656,43 @@ function parseBriefing(txt, prod){
 
   // ── 1. 가격 파싱 ──
   const sec1=getSection('가격');
-  const keyword=prod==='WTI'?'NYMEX':prod==='Benzene'?'FOB Korea':'CFR China';
-  const priceLine=sec1.find(l=>l.includes(keyword));
+  const productKeywords={
+    WTI:['WTI','NYMEX'],
+    Styrene:['CFR China','Styrene','SM'],
+    Benzene:['FOB Korea','Benzene','BZ'],
+    Butadiene:['CFR China','CFR NEA','Butadiene','BD']
+  };
+  const keys=productKeywords[prod]||[prod];
+  const priceLine=sec1.find(l=>keys.some(k=>l.includes(k))) || sec1[0] || '';
 
   if(priceLine){
-    // ── 가격: $972.00/mt 또는 $65.42/b 형태
-    const pm=priceLine.match(/\$([\d,]+(?:\.\d+)?)\/(?:mt|b)\b/i);
+    // 가격: $972.00/mt, $1,270/mt, $65.42/bbl, $65.42/b 모두 허용
+    const pm=priceLine.match(/\$\s*([\d,]+(?:\.\d+)?)\s*\/(?:mt|bbl|b)\b/i);
     if(pm)f.price=parseFloat(pm[1].replace(/,/g,''));
 
-    // ── 전일비 파싱 (3가지 패턴 순서대로 시도)
-    // 패턴1: 전일대비 +$3.00/mt 또는 전일대비 -$0.21/b  (SM, BZ, WTI)
-    let chgM=priceLine.match(/전일\s*대비\s*([+-])\$([\d.]+)/);
+    // 전일비: 전일대비 +$3.00 / -$0.21 / 0 / +3.00 모두 허용
+    let chgM=priceLine.match(/전일\s*대비\s*([+-])\s*\$?\s*([\d.]+)/);
     if(chgM){
       f.change=(chgM[1]==='-'?-1:1)*parseFloat(chgM[2]);
     }
-    // 패턴2: 전일대비 0  (BD 보합, $기호 없이 숫자만)
     if(f.change==null){
-      chgM=priceLine.match(/전일\s*대비\s*([+-]?)(\d+(?:\.\d+)?)[,\s]/);
+      chgM=priceLine.match(/전일\s*대비\s*(?:\$\s*)?([+-]?\d+(?:\.\d+)?)(?:\s*\/|[,\s]|$)/);
       if(chgM){
-        const sign=chgM[1]==='-'?-1:(chgM[1]==='+'?1:1);
-        f.change=sign*parseFloat(chgM[2]);
-      }
-    }
-    // 패턴3: 전일대비 0, 보합  (BD 0 단독 – 끝이 콤마/공백/문자열끝)
-    if(f.change==null){
-      chgM=priceLine.match(/전일\s*대비\s*([+-]?)(\d+(?:\.\d+)?)(?:[,\s]|$)/);
-      if(chgM){
-        const sign=chgM[1]==='-'?-1:(chgM[1]==='+'?1:1);
-        f.change=sign*parseFloat(chgM[2]);
+        f.change=parseFloat(chgM[1]);
       }
     }
 
-    // ── 방향: 텍스트 명시 우선, 없으면 ← / → 기호로 판단
+    // 변동률 직접 표기 허용: (+1.23%), -0.55%, 0%
+    const pctM=priceLine.match(/([+-]?\d+(?:\.\d+)?)%/);
+    if(pctM)f.pct=parseFloat(pctM[1]);
+
+    // 방향: 텍스트 명시 우선, 없으면 수치 기준
     const dirM=priceLine.match(/(상승|하락|보합)/);
     if(dirM)f.dir=dirM[1];
-    else if(priceLine.includes('←'))f.dir='변동';  // ← 있으면 change 부호로 결정
   }
 
   // 변동률 계산
-  if(f.price!=null&&f.change!=null){
+  if(f.pct==null && f.price!=null && f.change!=null){
     f.pct=f.change===0?0:parseFloat((f.change/(f.price-f.change)*100).toFixed(2));
   }
   if(!f.dir)f.dir=(f.change||0)===0?'보합':(f.pct||0)>0?'상승':'하락';
@@ -708,8 +702,9 @@ function parseBriefing(txt, prod){
   if(b2.length>0)f.commentary=b2[0];
   else if(f.price!=null){
     const ps=(f.pct||0)>=0?'+':'';
-    const label=prod==='Benzene'?'(FOB Korea)':'(CFR China)';
-    f.commentary=prod+label+'는 '+ps+(f.pct||0).toFixed(2)+'% 변동하여 톤당 $'+f.price.toFixed(0)+'에 '+f.dir+' 마감했다.';
+    const label=prod==='WTI'?'(NYMEX)':prod==='Benzene'?'(FOB Korea)':prod==='Butadiene'?'(CFR China / NEA)':'(CFR China)';
+    const unit=prod==='WTI'?'배럴당':'톤당';
+    f.commentary=prod+label+'는 '+ps+(f.pct||0).toFixed(2)+'% 변동하여 '+unit+' $'+f.price.toFixed(2)+'에 '+f.dir+' 마감했다.';
   }
 
   // ── 3. 변동요인 (오타 "변둉요인"도 포함) ──
