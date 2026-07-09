@@ -806,13 +806,114 @@ function dlImage(){
 }
 function copyMsg(){
   if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
-  const lines=PRODS.map(p=>{
-    const e=(allData[p]||[]).find(x=>x.date===curDate);
-    if(!e)return null;
-    const arr=e.direction==='상승'?'▲':e.direction==='하락'?'▼':'━';
-    return `[${p}] $${e.price.toFixed(2)} ${arr}${(e.changePct>=0?'+':'')+e.changePct.toFixed(2)}%`;
-  }).filter(Boolean);
-  navigator.clipboard.writeText(curDate+'\n'+lines.join('\n')).then(()=>toast('✅ 클립보드 복사 완료','ok'));
+
+  const shortName={WTI:'WTI',Styrene:'SM',Benzene:'BZ',Butadiene:'BD'};
+  const marketName={
+    WTI:'WTI 8월물 / NYMEX',
+    Styrene:'SM / CFR China',
+    Benzene:'BZ / FOB Korea',
+    Butadiene:'BD / CFR China'
+  };
+  const symbol={상승:'▲',하락:'▼',보합:'━'};
+  const unitText={WTI:'$/bbl',Styrene:'$/MT',Benzene:'$/MT',Butadiene:'$/MT'};
+  const krUnit={WTI:'배럴당',Styrene:'톤당',Benzene:'톤당',Butadiene:'톤당'};
+
+  function fmtNum(v,d=2){
+    if(v==null||isNaN(v))return'-';
+    return Number(v).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  }
+  function fmtSigned(v,d=2,suffix=''){
+    if(v==null||isNaN(v))return'-';
+    const n=Number(v);
+    return (n>0?'+':'')+n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+suffix;
+  }
+  function cleanText(v){
+    return String(v||'').replace(/<br\s*\/?>/gi,'\n').replace(/\r/g,'').trim();
+  }
+  function bulletLines(v){
+    const txt=cleanText(v);
+    if(!txt)return[];
+    return txt.split(/\n+|\s+\/\s+/).map(x=>x.replace(/^[•\-\*]\s*/,'').trim()).filter(Boolean);
+  }
+
+  const existing=PRODS.map(p=>({prod:p,entry:(allData[p]||[]).find(x=>x.date===curDate)})).filter(x=>x.entry);
+  if(existing.length===0){toast('복사할 데이터가 없습니다','err');return;}
+
+  const header=[];
+  header.push('📌 Daily Chemical Brief ('+curDate+')');
+  header.push('created by JSKIM of LAM');
+  header.push('');
+  header.push('■ 가격 요약');
+  existing.forEach(({prod:p,entry:e})=>{
+    const sym=symbol[e.direction]||'━';
+    const chg=fmtSigned(e.change,2,' USD');
+    const pct=fmtSigned(e.changePct,2,'%');
+    header.push('- '+shortName[p]+': $'+fmtNum(e.price,2)+' '+unitText[p]+' ('+sym+' '+chg+', '+pct+')');
+  });
+
+  const detail=[];
+  existing.forEach(({prod:p,entry:e})=>{
+    const sym=symbol[e.direction]||'━';
+    const chg=fmtSigned(e.change,2,' USD');
+    const pct=fmtSigned(e.changePct,2,'%');
+    detail.push('');
+    detail.push('━━━━━━━━━━━━━━');
+    detail.push('['+shortName[p]+'] '+marketName[p]);
+    detail.push('가격: $'+fmtNum(e.price,2)+' '+unitText[p]);
+    detail.push('전일대비: '+sym+' '+chg+' / '+pct+' / '+(e.direction||'보합'));
+
+    if(e.commentary){
+      detail.push('');
+      detail.push('코멘터리');
+      detail.push(cleanText(e.commentary));
+    }else{
+      detail.push('');
+      detail.push('코멘터리');
+      detail.push(shortName[p]+'는 '+krUnit[p]+' $'+fmtNum(e.price,2)+'에 '+(e.direction||'보합')+' 마감했다.');
+    }
+
+    const factors=bulletLines(e.factors);
+    if(factors.length>0){
+      detail.push('');
+      detail.push('변동요인');
+      factors.forEach(x=>detail.push('• '+x));
+    }
+
+    if(e.outlook){
+      detail.push('');
+      detail.push('전망');
+      detail.push(cleanText(e.outlook));
+    }
+  });
+
+  const msg=header.concat(detail).join('\n');
+
+  function fallbackCopy(text){
+    const ta=document.createElement('textarea');
+    ta.value=text;
+    ta.setAttribute('readonly','');
+    ta.style.position='fixed';
+    ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try{
+      const ok=document.execCommand('copy');
+      document.body.removeChild(ta);
+      if(ok)toast('✅ 카카오톡 보고용 상세 내용 복사 완료','ok');
+      else toast('❌ 클립보드 복사 실패','err');
+    }catch(e){
+      document.body.removeChild(ta);
+      toast('❌ 클립보드 복사 실패','err');
+    }
+  }
+
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(msg)
+      .then(()=>toast('✅ 카카오톡 보고용 상세 내용 복사 완료','ok'))
+      .catch(()=>fallbackCopy(msg));
+  }else{
+    fallbackCopy(msg);
+  }
 }
 
 loadData();
