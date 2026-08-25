@@ -19,7 +19,10 @@
   --wti:#DC2626; --sm:#7C3AED; --bz:#0369A1; --bd2:#047857;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;max-width:100%;overflow-x:hidden;}
 body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100vh;-webkit-font-smoothing:antialiased;}
+img,canvas,svg,video{max-width:100%;height:auto;}
+table{max-width:100%;}
 
 /* ── 헤더 ── */
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
@@ -55,7 +58,8 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .mini-wk-table td.wt-up{color:var(--up)!important;font-weight:700;}
 .mini-wk-table td.wt-dn{color:var(--dn)!important;font-weight:700;}
 .mini-wk-table td.wt-flt{color:var(--flt)!important;font-weight:700;}
-.main{flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;}
+.main{flex:1;min-width:0;max-width:100%;display:flex;flex-direction:column;gap:18px;}
+.main>*{min-width:0;max-width:100%;}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 
 /* ── 아카이브 드롭다운 ── */
@@ -332,6 +336,312 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     margin-top:2px;
   }
 }
+
+/* ── 모바일 전체 폭 고정: 어떤 화면에서도 가로 스크롤 금지 ── */
+@media(max-width:767px){
+  html,body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden!important;
+  }
+
+  .hdr,
+  .hdr-inner,
+  .layout,
+  .sidebar,
+  .main,
+  .daily-summary-wrap,
+  .grid4,
+  .wk-wrap,
+  .mini-wk-wrap,
+  .arc-select-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  .hdr-inner{
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+
+  .hdr-brand,
+  .hdr-title,
+  .hdr-center,
+  .hdr-right{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .hdr-brand{
+    width:100%;
+    justify-content:center;
+  }
+
+  .hdr-title{
+    text-align:center;
+    justify-content:center;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+  }
+
+  .copyright-text{
+    white-space:normal!important;
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .hdr-center{
+    width:100%;
+  }
+
+  .hdr-date-nav{
+    width:100%;
+    max-width:260px;
+    margin:0 auto;
+    justify-content:center;
+  }
+
+  .hdr-right{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+
+  .hdr-right .btn{
+    width:100%;
+    min-width:0;
+    padding:9px 5px!important;
+    font-size:11px!important;
+    justify-content:center;
+    white-space:normal!important;
+    line-height:1.2;
+    text-align:center;
+  }
+
+  .layout{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  .sidebar{
+    flex-direction:column!important;
+  }
+
+  .arc-select-wrap{
+    max-width:none!important;
+  }
+
+  .arc-select-btn{
+    max-width:100%;
+    min-width:0;
+  }
+
+  .main > div:first-child{
+    width:100%;
+    min-width:0;
+  }
+
+  #main-date{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  /* 본문 상단 이미지/PDF/메신저 버튼도 화면 안에서 자동 줄바꿈 */
+  .main > div:first-child > div:last-child{
+    width:100%;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+
+  .main > div:first-child > div:last-child .btn{
+    width:100%;
+    min-width:0;
+    padding:8px 4px!important;
+    font-size:10px!important;
+    justify-content:center;
+    white-space:normal!important;
+    text-align:center;
+    line-height:1.2;
+  }
+
+  /* 모든 카드/텍스트는 부모 폭 안에서 강제 줄바꿈 */
+  .p-card,
+  .card-hdr,
+  .card-price,
+  .section-body-text{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .section-body-text,
+  .sum-comment,
+  .sum-factor{
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+
+  .card-price{
+    gap:8px;
+  }
+
+  .p-val{
+    min-width:0;
+    max-width:62%;
+    font-size:clamp(27px,9vw,34px)!important;
+    overflow-wrap:anywhere;
+  }
+
+  .d-abs{
+    font-size:clamp(10px,3.4vw,13px)!important;
+  }
+
+  /* Summary는 완전 세로 카드 — 내부 스크롤도 없음 */
+  .daily-summary-wrap{
+    overflow:visible!important;
+  }
+
+  .daily-summary-table{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    table-layout:fixed!important;
+  }
+
+  .daily-summary-table tr,
+  .daily-summary-table td{
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  /* 주간 가격 요약도 좌우 스크롤 없이 화면에 맞춤 */
+  .wk-wrap{
+    overflow:hidden!important;
+    padding:12px 6px!important;
+  }
+
+  .wk-table{
+    width:100%!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+    font-size:8px!important;
+  }
+
+  .wk-table th,
+  .wk-table td{
+    padding:5px 1px!important;
+    font-size:8px!important;
+    letter-spacing:0!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+    line-height:1.25;
+  }
+
+  .wk-table th:first-child,
+  .wk-table td:first-child{
+    width:18%!important;
+    font-size:8px!important;
+  }
+
+  .wk-table th:not(:first-child),
+  .wk-table td:not(:first-child){
+    width:13.666%!important;
+  }
+
+  .wk-table td span{
+    font-size:7px!important;
+  }
+
+  /* 사이드 주간 요약 역시 화면 폭에 고정 */
+  .mini-wk-wrap{
+    overflow:hidden!important;
+    padding:9px 5px!important;
+  }
+
+  .mini-wk-table{
+    width:100%!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+  }
+
+  .mini-wk-table th,
+  .mini-wk-table td{
+    padding:3px 1px!important;
+    font-size:8px!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere;
+  }
+
+  .mini-wk-table th:first-child,
+  .mini-wk-table td:first-child{
+    width:24%!important;
+  }
+
+  .mini-wk-table th:not(:first-child),
+  .mini-wk-table td:not(:first-child){
+    width:19%!important;
+  }
+
+  /* 모달도 화면 밖으로 절대 넘지 않도록 */
+  #overlay,
+  #summary-edit-overlay{
+    padding:8px!important;
+    overflow-x:hidden!important;
+  }
+
+  #modal,
+  #summary-edit-modal{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  .m-grid3,
+  .m-grid2{
+    grid-template-columns:1fr!important;
+  }
+
+  .pfield input,
+  .pfield select,
+  .pfield textarea,
+  .summary-edit-field textarea{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+}
+
+/* 초소형 모바일 (320~380px) 추가 압축 */
+@media(max-width:380px){
+  .hdr-right{
+    grid-template-columns:1fr!important;
+  }
+
+  .main > div:first-child > div:last-child{
+    grid-template-columns:1fr!important;
+  }
+
+  .daily-summary-table td{
+    padding-left:70px!important;
+  }
+
+  .daily-summary-table td::before{
+    width:48px!important;
+    font-size:9px!important;
+  }
+
+  .wk-table th,
+  .wk-table td{
+    font-size:7px!important;
+  }
+
+  .wk-table td span{
+    font-size:6px!important;
+  }
+}
+
+
 /* ── 태블릿 / 폴드 접힌 화면 ── */
 @media(min-width:481px) and (max-width:1024px){
   .grid4{grid-template-columns:1fr 1fr;}
@@ -352,7 +662,9 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .p-val{font-size:38px;}
   .card-prod{font-size:20px;}
   .section-body-text{font-size:14px;}
-  .wk-wrap{overflow-x:auto;}
+  .wk-wrap{overflow:hidden;}
+  .wk-table{width:100%;max-width:100%;table-layout:fixed;}
+  .wk-table th,.wk-table td{padding-left:5px;padding-right:5px;}
 }
 </style>
 </head>
