@@ -228,6 +228,109 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .daily-summary-table td{padding:7px 8px;}
   .sum-prod-name,.sum-num,.sum-move,.sum-comment{font-size:13px;font-weight:900;}
   .sum-factors{font-size:10px;font-weight:700;margin-top:4px;}
+
+
+  /* ── 모바일 DAILY MARKET SUMMARY: 품목별 세로 카드 ── */
+  .daily-summary-wrap{
+    overflow:visible;
+  }
+  .daily-summary-head{
+    align-items:flex-start;
+    gap:4px;
+  }
+  .daily-summary-title{
+    font-size:16px;
+  }
+  .daily-summary-sub{
+    font-size:9px;
+    text-align:left;
+  }
+  .daily-summary-table{
+    display:block;
+    width:100%;
+    border-collapse:separate;
+  }
+  .daily-summary-table colgroup,
+  .daily-summary-table thead{
+    display:none;
+  }
+  .daily-summary-table tbody{
+    display:block;
+    width:100%;
+  }
+  .daily-summary-table tr{
+    display:block;
+    width:100%;
+    margin:0 0 12px;
+    border:1px solid var(--bd);
+    border-radius:10px;
+    background:#fff;
+    overflow:hidden;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+  }
+  .daily-summary-table tr:last-child{
+    margin-bottom:0;
+  }
+  .daily-summary-table td{
+    display:block;
+    width:100% !important;
+    text-align:left !important;
+    border-bottom:1px solid var(--g6);
+    padding:8px 12px 8px 82px !important;
+    position:relative;
+    min-height:36px;
+    font-size:13px;
+  }
+  .daily-summary-table td:last-child{
+    border-bottom:none;
+  }
+  .daily-summary-table td::before{
+    content:attr(data-label);
+    position:absolute;
+    left:12px;
+    top:9px;
+    width:58px;
+    font-family:var(--sans);
+    font-size:10px;
+    font-weight:900;
+    color:var(--g3);
+    letter-spacing:.02em;
+  }
+  .daily-summary-table td[data-label="품목"]{
+    padding:11px 12px !important;
+    background:#F9FAFB;
+    border-bottom:2px solid var(--bd);
+  }
+  .daily-summary-table td[data-label="품목"]::before{
+    display:none;
+  }
+  .daily-summary-table td[data-label="시황"]{
+    padding:10px 12px !important;
+  }
+  .daily-summary-table td[data-label="시황"]::before{
+    display:none;
+  }
+  .sum-prod-name,
+  .daily-summary-table .sum-num,
+  .daily-summary-table .sum-move,
+  .sum-comment{
+    font-size:14px !important;
+    font-weight:900 !important;
+  }
+  .sum-comment{
+    line-height:1.55;
+    margin-bottom:5px;
+  }
+  .sum-factors{
+    margin-top:5px;
+  }
+  .sum-factor{
+    display:block;
+    font-size:10px !important;
+    font-weight:700 !important;
+    line-height:1.45;
+    margin-top:2px;
+  }
 }
 /* ── 태블릿 / 폴드 접힌 화면 ── */
 @media(min-width:481px) and (max-width:1024px){
@@ -945,11 +1048,11 @@ function buildDailySummary(){
     const manualBadge=shown.isManual?'<span class="sum-manual-badge">수동</span>':'';
 
     return `<tr>
-      <td><div class="sum-prod-name">${names[p]}${manualBadge}</div></td>
-      <td class="sum-num ${dirCls}">${Number(e.price).toLocaleString('en-US',{minimumFractionDigits:priceDigits,maximumFractionDigits:priceDigits})}</td>
-      <td class="sum-num ${dirCls}">${chg}</td>
-      <td class="sum-move ${dirCls}">${escHtml(e.direction||'보합')}<br>(${pct})</td>
-      <td><div class="sum-comment">${escHtml(shown.comment||'코멘터리 없음')}</div>${factorHtml}</td>
+      <td data-label="품목"><div class="sum-prod-name">${names[p]}${manualBadge}</div></td>
+      <td data-label="가격" class="sum-num ${dirCls}">${Number(e.price).toLocaleString('en-US',{minimumFractionDigits:priceDigits,maximumFractionDigits:priceDigits})}</td>
+      <td data-label="변동폭" class="sum-num ${dirCls}">${chg}</td>
+      <td data-label="등락" class="sum-move ${dirCls}">${escHtml(e.direction||'보합')}<br>(${pct})</td>
+      <td data-label="시황"><div class="sum-comment">${escHtml(shown.comment||'코멘터리 없음')}</div>${factorHtml}</td>
     </tr>`;
   }).join('');
 
