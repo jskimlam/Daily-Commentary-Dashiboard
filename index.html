@@ -99,6 +99,34 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .text-bold{font-weight:800;}
 .no-data{padding:40px;text-align:center;color:#999;font-size:13px;}
 
+
+
+/* ── 데일리 한눈에 보기 ── */
+.daily-summary-wrap{background:var(--white);border:1px solid var(--bd);border-radius:14px;box-shadow:var(--sh);overflow:hidden;}
+.daily-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;background:#111827;color:#fff;border-bottom:1px solid #000;}
+.daily-summary-title{font-size:15px;font-weight:900;letter-spacing:.02em;}
+.daily-summary-sub{font-family:var(--mono);font-size:10px;color:#D1D5DB;white-space:nowrap;}
+.daily-summary-scroll{overflow-x:auto;}
+.daily-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;min-width:980px;}
+.daily-summary-table col.sum-prod{width:155px;}
+.daily-summary-table col.sum-price{width:92px;}
+.daily-summary-table col.sum-change{width:86px;}
+.daily-summary-table col.sum-dir{width:92px;}
+.daily-summary-table col.sum-text{width:auto;}
+.daily-summary-table td{border-right:1px solid #111;border-bottom:1px solid #111;padding:9px 10px;vertical-align:middle;}
+.daily-summary-table tr:last-child td{border-bottom:none;}
+.daily-summary-table td:last-child{border-right:none;}
+/* Summary 정보 계층: 품목/가격/변동/코멘터리 = 동일 크기·굵기, Factor = 가장 작게 */
+.sum-prod-name{font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:900;text-align:center;color:#111;}
+.sum-num{font-family:var(--mono);font-size:14px;font-weight:900;text-align:center;white-space:nowrap;}
+.sum-move{text-align:center;font-size:14px;font-weight:900;line-height:1.35;white-space:nowrap;}
+.sum-up{color:var(--up);}.sum-dn{color:var(--dn);}.sum-flt{color:var(--flt);}
+.sum-comment{font-size:14px;line-height:1.55;color:#111;font-weight:900;word-break:keep-all;}
+.sum-factors{margin-top:5px;font-size:11px;line-height:1.5;font-weight:700;word-break:keep-all;}
+.sum-factor{display:block;}
+.sum-factor::before{content:'• ';}
+.sum-empty{padding:22px;text-align:center;color:var(--g4);font-size:12px;}
+
 /* ── 주간 테이블 ── */
 .wk-wrap{background:var(--white);border:1px solid var(--bd);border-radius:14px;padding:20px;box-shadow:var(--sh);}
 .wk-title{font-family:var(--sans);font-size:16px;font-weight:900;letter-spacing:.02em;color:var(--g1);margin-bottom:14px;}
@@ -138,6 +166,12 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   body{background:#fff;}
   .hdr{position:static;box-shadow:none;}
   .hdr-right,.sidebar,.wk-wrap{display:none;}
+  .daily-summary-wrap{box-shadow:none;border-radius:0;}
+  .daily-summary-head{padding:8px 10px;}
+  .daily-summary-table{min-width:0;}
+  .daily-summary-table td{padding:5px 6px;}
+  .sum-prod-name,.sum-num,.sum-move,.sum-comment{font-size:10px;font-weight:900;line-height:1.35;}
+  .sum-factors{font-size:8px;font-weight:700;line-height:1.3;margin-top:3px;}
   .layout{padding:10px;flex-direction:row;}
   .main{width:100%;}
   .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
@@ -164,6 +198,13 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .p-val{font-size:32px;}
   .d-abs{font-size:13px;}
   .card-price{flex-wrap:wrap;gap:4px;}
+  .daily-summary-head{padding:11px 12px;}
+  .daily-summary-title{font-size:14px;}
+  .daily-summary-sub{font-size:9px;}
+  .daily-summary-table{min-width:850px;}
+  .daily-summary-table td{padding:7px 8px;}
+  .sum-prod-name,.sum-num,.sum-move,.sum-comment{font-size:13px;font-weight:900;}
+  .sum-factors{font-size:10px;font-weight:700;margin-top:4px;}
 }
 /* ── 태블릿 / 폴드 접힌 화면 ── */
 @media(min-width:481px) and (max-width:1024px){
@@ -230,11 +271,21 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
       <div style="font-family:var(--disp);font-size:28px;font-weight:900;" id="main-date">—</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-outline" onclick="dlImage()">📷 이미지</button>
+        <button class="btn btn-outline" onclick="dlImage()">📷 전체 이미지</button>
+        <button class="btn btn-outline" onclick="dlSummaryImage()">🖼 요약 이미지</button>
         <button class="btn btn-outline" onclick="window.print()">🖨 PDF</button>
         <button class="btn btn-outline" onclick="copyMsg()">💬 메신저</button>
       </div>
     </div>
+    <section class="daily-summary-wrap" id="daily-summary-wrap">
+      <div class="daily-summary-head">
+        <div class="daily-summary-title">DAILY MARKET SUMMARY</div>
+        <div class="daily-summary-sub"><span id="daily-summary-date">—</span> · 코멘터리 원인 → FACTOR 근거 자동연결</div>
+      </div>
+      <div class="daily-summary-scroll">
+        <div id="daily-summary"><div class="sum-empty">요약 데이터 없음</div></div>
+      </div>
+    </section>
     <div class="grid4" id="grid"></div>
     <div class="wk-wrap">
       <div class="wk-title">📊 주간 가격 요약 <span id="wk-label" style="font-size:11px;color:#6b7280;margin-left:8px;"></span></div>
@@ -300,6 +351,7 @@ function selDate(d){
   document.getElementById('arc-selected-label').textContent=d;
   document.getElementById('arc-dropdown').classList.remove('show');
   document.getElementById('grid').innerHTML=PRODS.map(p=>renderCard(p,(allData[p]||[]).find(e=>e.date===d),d)).join('');
+  safeBuildDailySummary();
   buildArc();
   buildWkTable();
   buildMiniWkTable();
@@ -355,6 +407,334 @@ function renderCard(prod,entry,date){
     ${entry.outlook?`<div class="section-label-box"><span class="section-label-text">Outlook</span></div>
     <div class="section-body-text">${entry.outlook.replace(/\n/g,'<br>')}</div>`:''}
   </div>`;
+}
+
+
+// ── 데일리 상단 요약 ──
+function escHtml(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+// ── 상단 Summary 자동 선별 로직 V4 ──
+// 핵심 원칙:
+// 1) Commentary에서 당일 상승/하락/보합의 "원인"을 먼저 읽는다.
+// 2) Market Factors는 독립 점수순이 아니라 Commentary 원인과 연결되는 항목을 최우선으로 고른다.
+// 3) 같은 원인을 더 구체화하는 숫자·회사·설비·지역·재고·가동률 정보에 가점을 준다.
+// 4) 직접 연결되는 Factor가 없을 때만 일반 시장 중요도 점수를 fallback으로 사용한다.
+function splitSummaryText(txt){
+  let clean=String(txt||'')
+    .replace(/<br\s*\/?>/gi,'\n')
+    .replace(/\r/g,'')
+    .replace(/[•*]/g,'-')
+    .trim();
+  if(!clean)return[];
+
+  // 구형/모바일 브라우저 호환: lookbehind 사용하지 않음
+  clean=clean.replace(/([.!?])\s+/g,'$1\n');
+  return clean
+    .split(/\n+|\s+\/\s+/)
+    .map(x=>x.replace(/^-\s*/,'').trim())
+    .filter(x=>x.length>=8);
+}
+
+function normSummaryText(v){
+  return String(v||'').toLowerCase()
+    .replace(/[^0-9a-z가-힣%$]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function textSimilarity(a,b){
+  const toks=s=>new Set(normSummaryText(s).split(/\s+/).filter(x=>x.length>=2));
+  const A=toks(a),B=toks(b);
+  if(!A.size||!B.size)return 0;
+  let same=0;A.forEach(x=>{if(B.has(x))same++;});
+  return same/Math.min(A.size,B.size);
+}
+
+// 코멘터리 원인과 팩터를 연결하기 위한 시장 개념 사전
+// 여러 표현이 같은 시장 원인을 뜻하면 같은 theme으로 묶는다.
+const SUMMARY_THEMES={
+  supply_tight:['공급 타이트','공급 부족','현물 부족','물량 부족','가용 물량','제한된 공급','공급 제한','공급 우려','타이트','부족','셧다운','정기보수','감산','저율 가동','가동률 하락','생산 감소','생산 차질','크래커 셧다운'],
+  supply_loose:['공급 증가','공급 확대','공급 과잉','증산','생산 증가','가동률 상승','재가동','물량 증가','오퍼 증가'],
+  inventory_down:['재고 감소','재고 하락','재고 축소','재고 소진','낮은 재고','재고 타이트','재고 부족','재고 최저'],
+  inventory_up:['재고 증가','재고 상승','재고 부담','높은 재고','재고 과잉','재고 누적'],
+  demand_strong:['수요 증가','수요 확대','수요 강세','수요 개선','구매 증가','매수 증가','매수세','구매 관심','수입 수요','수출 수요','다운스트림 수요 개선','최종수요 개선'],
+  demand_weak:['수요 부진','수요 약세','수요 감소','구매 부진','매수 부진','관망','구매 관망','최종수요 부진','다운스트림 부진','가격 수용력','구매 활동 제한'],
+  feedstock_up:['원료 상승','원료 강세','원가 상승','원가 강세','벤젠 상승','벤젠 강세','나프타 상승','나프타 강세','원유 상승','유가 상승','업스트림 강세','upstream 강세'],
+  feedstock_down:['원료 하락','원료 약세','원가 하락','벤젠 하락','벤젠 약세','나프타 하락','나프타 약세','원유 하락','유가 하락','업스트림 약세','upstream 약세'],
+  domestic_up:['중국 내수 강세','중국 내수가격 상승','내수 강세','내수 상승','선물 강세','선물 상승','dce 상승','가격 급등'],
+  domestic_down:['중국 내수 약세','중국 내수가격 하락','내수 약세','내수 하락','선물 약세','선물 하락','dce 하락','가격 급락'],
+  export_import:['수출','수입','수출 수요','수입 수요','역외 물량','수출 오퍼','수입 오퍼','인도향','중국향','한국산','일본산'],
+  geopolitical:['중동','이란','호르무즈','제재','지정학','전쟁','공격','봉쇄','통항','홍해','미국·이란','미-이란'],
+  profit_taking:['차익실현','차익 실현','이익 실현','profit taking'],
+  currency_macro:['달러 강세','달러 약세','금리','경기침체','경기 둔화','경기 회복','거시경제','매크로'],
+  margin:['마진','스프레드','채산성','손익','원가 부담','생산 마진'],
+  premium_spread:['프리미엄','백워데이션','백워드','콘탱고','스프레드 확대','스프레드 축소'],
+  offer_trade:['오퍼','비드','거래','협상','현물','spot','스팟','매수','매도','논의가격']
+};
+
+const SUMMARY_STOPWORDS=new Set([
+  '가격','시장','당일','금일','전일','전일대비','마감','마감했다','마감하며','기록','기록했다',
+  '상승','하락','보합','강세','약세','영향','영향으로','따라','때문','때문에','가운데','반면','다만',
+  '지속','확대','축소','수준','형성','거래','보이며','나타내며','이어지며','달러','톤당','배럴당',
+  'cfr','fob','china','korea','wti','styrene','benzene','butadiene','sm','bz','bd'
+]);
+
+function getThemeHits(text){
+  const t=normSummaryText(text);
+  const hits=[];
+  Object.entries(SUMMARY_THEMES).forEach(([theme,words])=>{
+    if(words.some(w=>t.includes(normSummaryText(w))))hits.push(theme);
+  });
+  return hits;
+}
+
+function getCauseTokens(text){
+  const raw=normSummaryText(text);
+  if(!raw)return[];
+  const toks=raw.split(/\s+/)
+    .map(x=>x.trim())
+    .filter(x=>x.length>=2 && !SUMMARY_STOPWORDS.has(x) && !/^\d/.test(x));
+  return [...new Set(toks)].slice(0,30);
+}
+
+// 코멘터리 전체뿐 아니라 '원인 연결어' 주변의 표현에 우선 가중치를 주기 위한 컨텍스트
+function buildCommentaryContext(commentary,prod,dir){
+  const text=String(commentary||'').replace(/\s+/g,' ').trim();
+  const themes=getThemeHits(text);
+  const tokens=getCauseTokens(text);
+
+  // 원인 표현이 자주 등장하는 구간을 별도 추출
+  const clauses=text.split(/(?:하지만|그러나|반면|다만|한편|및|동시에|,|;)/)
+    .map(x=>x.trim()).filter(x=>x.length>=8);
+  const causalClauses=clauses.filter(x=>/영향|때문|따라|로 인해|지지|부담|압력|우려|견인|끌어올|끌어내|차익실현|타이트|부진|강세|약세/.test(x));
+  const causeText=(causalClauses.length?causalClauses:clauses).join(' ');
+  const causeThemes=getThemeHits(causeText);
+  const causeTokens=getCauseTokens(causeText);
+
+  return {text,prod,dir,themes,tokens,causeThemes,causeTokens};
+}
+
+function baseMarketScore(s,prod,dir){
+  let score=0;
+  const t=String(s||'');
+  const coreKw=['수요','공급','재고','가동','생산','정기보수','셧다운','수입','수출','오퍼','현물','선물','매수','매도','마진','원가','유가','나프타','벤젠','원료','제재','중동','호르무즈','프리미엄','타이트','증산','감산','차익실현','달러'];
+  const causalKw=['영향','때문','따라','로 인해','부담','지지','압력','우려','확대','축소','증가','감소','상승','하락','강세','약세','타이트','완화'];
+  coreKw.forEach(k=>{if(t.includes(k))score+=0.55;});
+  causalKw.forEach(k=>{if(t.includes(k))score+=0.30;});
+
+  const upKw=['상승','강세','증가','타이트','부족','감산','재고 감소','프리미엄 상승','매수'];
+  const dnKw=['하락','약세','감소','과잉','증산','재고 증가','차익실현','매도','수요 부진'];
+  const fltKw=['보합','관망','제한적','혼조','좁은 범위','균형'];
+  const dirKws=dir==='상승'?upKw:dir==='하락'?dnKw:fltKw;
+  dirKws.forEach(k=>{if(t.includes(k))score+=0.55;});
+
+  const prodKw={
+    WTI:['WTI','원유','브렌트','OPEC','이란','호르무즈','제재'],
+    Benzene:['벤젠','Benzene','BZ','나프타','Sinopec','FOB Korea'],
+    Styrene:['스티렌','Styrene','SM','벤젠','PS','ABS','CFR China'],
+    Butadiene:['부타디엔','Butadiene','BD','합성고무','크래커','CFR China']
+  };
+  (prodKw[prod]||[]).forEach(k=>{if(t.toLowerCase().includes(k.toLowerCase()))score+=0.35;});
+  if(/전망|예상|향후|앞으로|가능성|것으로 보/.test(t))score-=1.2;
+  return score;
+}
+
+function specificityScore(text){
+  const t=String(text||'');
+  let score=0;
+  // 숫자/증감률/물량/가격/가동률 등 '근거'가 있는 팩터를 우선
+  if(/[+$]?\d[\d,.]*\s*(?:%|달러|위안|mt|톤|배럴|USD|kt|천톤|만톤|pp)?/i.test(t))score+=3.2;
+  if(/\b(?:Sinopec|CPC|YNCC|Lotte|Hengli|Shenghong|ZPC|Formosa|LG|SK|S-Oil|BASF|Asahi|Denka)\b/i.test(t))score+=1.8;
+  if(/중국|동중국|화동|한국|일본|인도|동북아|동남아|미국|유럽|여수|닝보|대만|싱가포르/.test(t))score+=1.3;
+  if(/가동률|정기보수|셧다운|재가동|생산능력|수출량|수입량|재고|항만|선물|오퍼|비드|프리미엄|스프레드/.test(t))score+=1.5;
+  return score;
+}
+
+function factorRelationScore(factor,ctx){
+  const f=String(factor||'');
+  const fNorm=normSummaryText(f);
+  const fThemes=getThemeHits(f);
+  const fTokens=getCauseTokens(f);
+  let score=0;
+
+  // 1순위: Commentary 원인 theme과 직접 일치
+  const causeThemeMatches=fThemes.filter(x=>ctx.causeThemes.includes(x));
+  const allThemeMatches=fThemes.filter(x=>ctx.themes.includes(x));
+  score+=causeThemeMatches.length*8.5;
+  score+=allThemeMatches.filter(x=>!causeThemeMatches.includes(x)).length*4.0;
+
+  // 2순위: Commentary 원인 표현의 실제 단어가 Factor에도 등장
+  let causeTokenMatches=0;
+  ctx.causeTokens.forEach(tok=>{if(fNorm.includes(tok))causeTokenMatches++;});
+  let tokenMatches=0;
+  ctx.tokens.forEach(tok=>{if(fNorm.includes(tok))tokenMatches++;});
+  score+=Math.min(causeTokenMatches,4)*2.6;
+  score+=Math.min(Math.max(tokenMatches-causeTokenMatches,0),4)*1.2;
+
+  // 3순위: 그 원인을 수치/회사/설비/지역 정보로 구체화하는 문장
+  score+=specificityScore(f);
+
+  // 4순위: 가격 방향/품목 관련성은 보조점수만 부여
+  score+=baseMarketScore(f,ctx.prod,ctx.dir);
+
+  // 직접 연결이 전혀 없으면 강한 감점 → 관련 팩터 우선 원칙 유지
+  if(causeThemeMatches.length===0 && causeTokenMatches===0){
+    if(allThemeMatches.length===0 && tokenMatches===0)score-=7;
+    else score-=2.5;
+  }
+
+  // 코멘터리와 문장 자체가 거의 복사 수준이면 '구체화'가 아니므로 감점
+  const sim=textSimilarity(f,ctx.text);
+  if(sim>=0.78)score-=4;
+  else if(sim>=0.62)score-=1.5;
+
+  return {score,fThemes,causeThemeMatches,allThemeMatches,causeTokenMatches,tokenMatches,specificity:specificityScore(f)};
+}
+
+function trimSummaryText(s,max=165){
+  s=String(s||'').replace(/\s+/g,' ').trim();
+  if(s.length<=max)return s;
+  const cut=s.lastIndexOf(' ',max);
+  return (cut>80?s.slice(0,cut):s.slice(0,max))+'…';
+}
+
+function pickSummaryCommentary(txt,prod,dir,max=165){
+  const items=splitSummaryText(txt);
+  if(!items.length)return'';
+
+  // 코멘터리에서는 가격 방향과 원인 연결어가 같이 있는 문장을 우선
+  const ranked=items.map((s,i)=>{
+    let score=baseMarketScore(s,prod,dir);
+    if(/영향|때문|따라|로 인해|지지|부담|압력|우려|견인|끌어올|끌어내|차익실현/.test(s))score+=4;
+    if(getThemeHits(s).length)score+=getThemeHits(s).length*1.8;
+    // "상승/하락/보합으로 마감" 같은 결론만 있고 원인이 빈약하면 감점
+    if(/(?:상승|하락|보합)(?:으로)?\s*마감/.test(s) && getThemeHits(s).length===0)score-=3;
+    return {s,i,score};
+  }).sort((a,b)=>b.score-a.score||a.i-b.i);
+
+  let best=ranked[0].s;
+  if(best.length<60 && ranked[1] && textSimilarity(best,ranked[1].s)<0.55){
+    const joined=best+' '+ranked[1].s;
+    if(joined.length<=max+25)best=joined;
+  }
+  return trimSummaryText(best,max);
+}
+
+function pickSummaryFactors(txt,prod,dir,commentary,limit=2){
+  const items=splitSummaryText(txt);
+  if(!items.length)return[];
+
+  const ctx=buildCommentaryContext(commentary,prod,dir);
+  const ranked=items.map((s,i)=>{
+    const rel=factorRelationScore(s,ctx);
+    return {s,i,...rel};
+  }).sort((a,b)=>b.score-a.score || b.specificity-a.specificity || a.i-b.i);
+
+  const selected=[];
+  const coveredThemes=new Set();
+
+  // 첫 번째는 Commentary 원인을 가장 구체적으로 설명하는 팩터
+  if(ranked.length){
+    const first=ranked[0];
+    // 관련도가 지나치게 낮은 경우에도 fallback으로 시장 중요도가 가장 높은 1개는 허용
+    if(first.score>-4){
+      selected.push(first);
+      first.fThemes.forEach(x=>coveredThemes.add(x));
+    }
+  }
+
+  // 두 번째는 가능하면 Commentary의 '다른 원인'을 구체화하는 팩터 우선
+  for(const x of ranked){
+    if(selected.some(y=>y.s===x.s))continue;
+    if(selected.some(y=>textSimilarity(y.s,x.s)>=0.58))continue;
+
+    const uncovCause=x.causeThemeMatches.filter(t=>!coveredThemes.has(t));
+    const hasNewCause=uncovCause.length>0;
+    const strongSameCause=x.causeThemeMatches.length>0 && x.specificity>=3.0;
+
+    if(hasNewCause || strongSameCause){
+      // 두 번째 항목은 Commentary와 연결성이 실제로 있어야 함
+      if(x.score>=2.0){
+        selected.push(x);
+        x.fThemes.forEach(t=>coveredThemes.add(t));
+        break;
+      }
+    }
+  }
+
+  // 다른 원인 매칭이 없을 때만 차선의 관련 팩터를 선택
+  if(selected.length<limit){
+    for(const x of ranked){
+      if(selected.some(y=>y.s===x.s))continue;
+      if(selected.some(y=>textSimilarity(y.s,x.s)>=0.58))continue;
+      if(x.score>=4.5){selected.push(x);break;}
+    }
+  }
+
+  return selected.slice(0,limit).map(x=>trimSummaryText(x.s,125));
+}
+
+function safeBuildDailySummary(){
+  try{
+    buildDailySummary();
+  }catch(err){
+    console.error('Daily summary render error:',err);
+    const box=document.getElementById('daily-summary');
+    const dateEl=document.getElementById('daily-summary-date');
+    if(dateEl)dateEl.textContent=curDate||'—';
+    if(box)box.innerHTML='<div class="sum-empty">요약 표시 오류 · 상세 데이터는 정상 로드됩니다.</div>';
+  }
+}
+
+function buildDailySummary(){
+  const box=document.getElementById('daily-summary');
+  const dateEl=document.getElementById('daily-summary-date');
+  if(!box)return;
+  if(dateEl)dateEl.textContent=curDate||'—';
+
+  const order=['WTI','Benzene','Styrene','Butadiene'];
+  const names={WTI:'Crude Oil (WTI)',Benzene:'Benzene',Styrene:'Styrene',Butadiene:'Butadiene'};
+  const existing=order.map(p=>({p,e:(allData[p]||[]).find(x=>x.date===curDate)})).filter(x=>x.e);
+  if(existing.length===0){box.innerHTML='<div class="sum-empty">선택 날짜의 요약 데이터가 없습니다.</div>';return;}
+
+  const rows=existing.map(({p,e})=>{
+    const dir=e.direction==='상승'?'up':e.direction==='하락'?'dn':'flt';
+    const dirCls='sum-'+dir;
+    const priceDigits=2;
+    const chg=e.change==null?'—':(Number(e.change)>0?'+':'')+Number(e.change).toFixed(2);
+    const pct=e.changePct==null?'—':(Number(e.changePct)>0?'+':'')+Number(e.changePct).toFixed(2)+'%';
+
+    // Commentary가 Summary의 기준(원인)이고, Factor는 그 원인을 구체화하는 근거로 연결
+    const comment=pickSummaryCommentary(e.commentary,p,e.direction,165);
+    let factors=pickSummaryFactors(e.factors,p,e.direction,comment,2);
+
+    // 과거 데이터 등에서 commentary/factors가 비어 있으면 outlook을 최후 보조자료로만 사용
+    const shownComment=comment || trimSummaryText((e.factors||e.outlook||'').split(/\n/)[0]||'',165);
+    if(!factors.length && e.outlook && shownComment){
+      const fallback=pickSummaryFactors(e.outlook,p,e.direction,shownComment,1);
+      factors=fallback;
+    }
+
+    const factorHtml=factors.length
+      ?`<div class="sum-factors ${dirCls}">${factors.map(f=>`<span class="sum-factor">${escHtml(f)}</span>`).join('')}</div>`
+      :'';
+    return `<tr>
+      <td><div class="sum-prod-name">${names[p]}</div></td>
+      <td class="sum-num ${dirCls}">${Number(e.price).toLocaleString('en-US',{minimumFractionDigits:priceDigits,maximumFractionDigits:priceDigits})}</td>
+      <td class="sum-num ${dirCls}">${chg}</td>
+      <td class="sum-move ${dirCls}">${escHtml(e.direction||'보합')}<br>(${pct})</td>
+      <td><div class="sum-comment">${escHtml(shownComment||'코멘터리 없음')}</div>${factorHtml}</td>
+    </tr>`;
+  }).join('');
+
+  box.innerHTML=`<table class="daily-summary-table">
+    <colgroup><col class="sum-prod"><col class="sum-price"><col class="sum-change"><col class="sum-dir"><col class="sum-text"></colgroup>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 
 // ── 주간 테이블 ──
@@ -803,6 +1183,47 @@ function dlImage(){
     const a=document.createElement('a');a.href=canvas.toDataURL();
     a.download='DailyBrief_'+curDate+'.png';a.click();
   }).catch(()=>el.style.cssText=origStyle);
+}
+function dlSummaryImage(){
+  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
+  const src=document.getElementById('daily-summary-wrap');
+  if(!src){toast('요약 영역을 찾을 수 없습니다','err');return;}
+
+  // 화면 레이아웃/모바일 스크롤 상태와 무관하게 1400px 보고용 폭으로 복제하여 캡처
+  const clone=src.cloneNode(true);
+  clone.id='daily-summary-capture';
+  clone.style.position='fixed';
+  clone.style.left='-20000px';
+  clone.style.top='0';
+  clone.style.width='1400px';
+  clone.style.maxWidth='none';
+  clone.style.background='#fff';
+  clone.style.boxShadow='none';
+  clone.style.borderRadius='12px';
+  const sc=clone.querySelector('.daily-summary-scroll');
+  if(sc)sc.style.overflow='visible';
+  const tbl=clone.querySelector('.daily-summary-table');
+  if(tbl){tbl.style.minWidth='0';tbl.style.width='100%';}
+  document.body.appendChild(clone);
+
+  html2canvas(clone,{
+    backgroundColor:'#ffffff',
+    scale:2,
+    width:1400,
+    windowWidth:1600,
+    useCORS:true
+  }).then(canvas=>{
+    clone.remove();
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download='DailySummary_'+curDate+'.png';
+    a.click();
+    toast('✅ 요약 이미지 저장 완료','ok');
+  }).catch(err=>{
+    console.error('Summary image error:',err);
+    clone.remove();
+    toast('❌ 요약 이미지 저장 실패','err');
+  });
 }
 function copyMsg(){
   if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
