@@ -127,6 +127,30 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
 .sum-factor::before{content:'• ';}
 .sum-empty{padding:22px;text-align:center;color:var(--g4);font-size:12px;}
 
+.summary-edit-btn{border:1px solid rgba(255,255,255,.45);background:#fff;color:#111827;border-radius:7px;padding:6px 10px;font-family:var(--sans);font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap;}
+.summary-edit-btn:hover{background:#F3F4F6;}
+.sum-manual-badge{display:inline-block;margin-left:6px;padding:1px 5px;border-radius:4px;background:#111827;color:#fff;font-family:var(--mono);font-size:8px;font-weight:900;vertical-align:middle;letter-spacing:.03em;}
+
+#summary-edit-overlay{position:fixed;inset:0;z-index:620;background:rgba(0,0,0,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;}
+#summary-edit-overlay.open{display:flex;}
+#summary-edit-modal{width:920px;max-width:97vw;max-height:94vh;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.28);}
+.summary-edit-head{padding:18px 22px;background:#111827;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.summary-edit-title{font-size:17px;font-weight:900;}
+.summary-edit-date{font-family:var(--mono);font-size:11px;color:#D1D5DB;margin-top:3px;}
+.summary-edit-body{padding:18px 22px;overflow:auto;background:#F9FAFB;}
+.summary-edit-note{font-size:12px;line-height:1.55;color:#4B5563;background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;margin-bottom:12px;}
+.summary-edit-prod{background:#fff;border:1px solid #D1D5DB;border-radius:10px;padding:14px;margin-bottom:12px;}
+.summary-edit-prod:last-child{margin-bottom:0;}
+.summary-edit-prod-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:14px;font-weight:900;}
+.summary-edit-auto-btn{border:1px solid #D1D5DB;background:#fff;border-radius:6px;padding:5px 8px;font-size:10px;font-weight:800;cursor:pointer;}
+.summary-edit-auto-btn:hover{background:#F3F4F6;}
+.summary-edit-field{margin-bottom:9px;}
+.summary-edit-field:last-child{margin-bottom:0;}
+.summary-edit-field label{display:block;font-size:10px;font-weight:900;color:#6B7280;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.summary-edit-field textarea{width:100%;border:1px solid #D1D5DB;border-radius:7px;padding:9px 10px;font-family:var(--sans);font-size:13px;line-height:1.55;resize:vertical;outline:none;background:#fff;color:#111827;}
+.summary-edit-field textarea:focus{border-color:#111827;box-shadow:0 0 0 2px rgba(17,24,39,.06);}
+.summary-edit-foot{padding:14px 22px;border-top:1px solid #E5E7EB;background:#fff;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+
 /* ── 주간 테이블 ── */
 .wk-wrap{background:var(--white);border:1px solid var(--bd);border-radius:14px;padding:20px;box-shadow:var(--sh);}
 .wk-title{font-family:var(--sans);font-size:16px;font-weight:900;letter-spacing:.02em;color:var(--g1);margin-bottom:14px;}
@@ -170,6 +194,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .daily-summary-head{padding:8px 10px;}
   .daily-summary-table{min-width:0;}
   .daily-summary-table td{padding:5px 6px;}
+  .summary-edit-btn,.sum-manual-badge{display:none!important;}
   .sum-prod-name,.sum-num,.sum-move,.sum-comment{font-size:10px;font-weight:900;line-height:1.35;}
   .sum-factors{font-size:8px;font-weight:700;line-height:1.3;margin-top:3px;}
   .layout{padding:10px;flex-direction:row;}
@@ -203,6 +228,7 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
   .daily-summary-sub{font-size:9px;}
   .daily-summary-table{min-width:850px;}
   .daily-summary-table td{padding:7px 8px;}
+  .summary-edit-btn{padding:5px 7px;font-size:10px;}
   .sum-prod-name,.sum-num,.sum-move,.sum-comment{font-size:13px;font-weight:900;}
   .sum-factors{font-size:10px;font-weight:700;margin-top:4px;}
 }
@@ -280,7 +306,10 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     <section class="daily-summary-wrap" id="daily-summary-wrap">
       <div class="daily-summary-head">
         <div class="daily-summary-title">DAILY MARKET SUMMARY</div>
-        <div class="daily-summary-sub"><span id="daily-summary-date">—</span> · 코멘터리 원인 → FACTOR 근거 자동연결</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+          <div class="daily-summary-sub"><span id="daily-summary-date">—</span> · 코멘터리 원인 → FACTOR 근거 자동연결</div>
+          <button class="summary-edit-btn" onclick="openSummaryEdit()">✎ 요약 수정</button>
+        </div>
       </div>
       <div class="daily-summary-scroll">
         <div id="daily-summary"><div class="sum-empty">요약 데이터 없음</div></div>
@@ -308,6 +337,31 @@ body{font-family:var(--sans);background:var(--g7);color:var(--g1);min-height:100
     </div>
   </div>
 </div>
+
+<div id="summary-edit-overlay">
+  <div id="summary-edit-modal">
+    <div class="summary-edit-head">
+      <div>
+        <div class="summary-edit-title">DAILY MARKET SUMMARY · 수동 수정</div>
+        <div class="summary-edit-date" id="summary-edit-date">—</div>
+      </div>
+      <button onclick="closeSummaryEdit()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:28px;line-height:1;">&times;</button>
+    </div>
+    <div class="summary-edit-body">
+      <div class="summary-edit-note">
+        자동 선별된 코멘터리와 FACTOR를 기준으로 필요한 부분만 수정합니다. 수동 수정값이 있는 품목은 해당 날짜의 Summary에서 우선 표시되며, 상세 카드의 원본 코멘터리/변동요인은 변경하지 않습니다.
+      </div>
+      <div id="summary-edit-panels"></div>
+    </div>
+    <div class="summary-edit-foot">
+      <button class="btn btn-outline" onclick="resetSummaryDate()">↺ 이 날짜 전체 자동복원</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" onclick="closeSummaryEdit()">취소</button>
+        <button class="btn btn-primary" onclick="saveSummaryEdits()">✓ 요약 수정 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -325,6 +379,45 @@ function checkAdmin(){
   if(pw==="0111")return true;
   if(pw!==null)alert("비밀번호가 올바르지 않습니다.");
   return false;
+}
+
+
+// ── Summary 수동 수정 저장소 ──
+// 상세 데이터는 건드리지 않고 Summary 표시값만 별도로 저장.
+// 같은 브라우저/같은 사이트 주소에서는 날짜를 다시 열어도 유지된다.
+const SUMMARY_OVERRIDE_STORAGE='DailyChemicalBrief_SummaryOverrides_v1';
+let summaryOverrides=loadSummaryOverrides();
+
+function loadSummaryOverrides(){
+  try{
+    const raw=localStorage.getItem(SUMMARY_OVERRIDE_STORAGE);
+    const parsed=raw?JSON.parse(raw):{};
+    return parsed&&typeof parsed==='object'?parsed:{};
+  }catch(e){
+    console.warn('Summary override load failed:',e);
+    return {};
+  }
+}
+function persistSummaryOverrides(){
+  try{
+    localStorage.setItem(SUMMARY_OVERRIDE_STORAGE,JSON.stringify(summaryOverrides));
+    return true;
+  }catch(e){
+    console.error('Summary override save failed:',e);
+    return false;
+  }
+}
+function getSummaryOverride(date,prod){
+  return summaryOverrides?.[date]?.[prod]||null;
+}
+function setSummaryOverride(date,prod,value){
+  if(!summaryOverrides[date])summaryOverrides[date]={};
+  summaryOverrides[date][prod]=value;
+}
+function deleteSummaryOverride(date,prod){
+  if(!summaryOverrides[date])return;
+  delete summaryOverrides[date][prod];
+  if(Object.keys(summaryOverrides[date]).length===0)delete summaryOverrides[date];
 }
 
 // ── 아카이브 드롭다운 ──
@@ -678,6 +771,148 @@ function pickSummaryFactors(txt,prod,dir,commentary,limit=2){
   return selected.slice(0,limit).map(x=>trimSummaryText(x.s,125));
 }
 
+
+function getAutoSummaryContent(prod,e){
+  if(!e)return{comment:'',factors:[]};
+  const comment=pickSummaryCommentary(e.commentary,prod,e.direction,165);
+  let factors=pickSummaryFactors(e.factors,prod,e.direction,comment,2);
+  const shownComment=comment || trimSummaryText((e.factors||e.outlook||'').split(/\n/)[0]||'',165);
+  if(!factors.length && e.outlook && shownComment){
+    factors=pickSummaryFactors(e.outlook,prod,e.direction,shownComment,1);
+  }
+  return{comment:shownComment||'',factors};
+}
+
+function getDisplayedSummaryContent(prod,e){
+  const auto=getAutoSummaryContent(prod,e);
+  const ov=getSummaryOverride(curDate,prod);
+  if(!ov)return{...auto,isManual:false};
+  const manualFactors=[ov.factor1,ov.factor2].map(x=>String(x||'').trim()).filter(Boolean);
+  return{
+    comment:String(ov.comment||'').trim() || auto.comment,
+    factors:manualFactors.length?manualFactors:auto.factors,
+    isManual:true
+  };
+}
+
+// ── Summary 수동 수정 UI ──
+function openSummaryEdit(){
+  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
+  if(!checkAdmin())return;
+
+  const overlay=document.getElementById('summary-edit-overlay');
+  const panels=document.getElementById('summary-edit-panels');
+  const dateEl=document.getElementById('summary-edit-date');
+  if(!overlay||!panels)return;
+  if(dateEl)dateEl.textContent=curDate;
+
+  const order=['WTI','Benzene','Styrene','Butadiene'];
+  const names={WTI:'Crude Oil (WTI)',Benzene:'Benzene',Styrene:'Styrene',Butadiene:'Butadiene'};
+  const blocks=[];
+
+  order.forEach(p=>{
+    const e=(allData[p]||[]).find(x=>x.date===curDate);
+    if(!e)return;
+    const auto=getAutoSummaryContent(p,e);
+    const ov=getSummaryOverride(curDate,p);
+    const comment=ov?.comment ?? auto.comment;
+    const factor1=ov?.factor1 ?? (auto.factors[0]||'');
+    const factor2=ov?.factor2 ?? (auto.factors[1]||'');
+
+    blocks.push(`<div class="summary-edit-prod" data-prod="${p}">
+      <div class="summary-edit-prod-title">
+        <span>${names[p]}</span>
+        <button class="summary-edit-auto-btn" onclick="fillAutoSummaryProduct('${p}')">자동 추천값으로 되돌리기</button>
+      </div>
+      <div class="summary-edit-field">
+        <label>Commentary</label>
+        <textarea id="sum-edit-comment-${p}" rows="3">${escHtml(comment)}</textarea>
+      </div>
+      <div class="summary-edit-field">
+        <label>Factor 1</label>
+        <textarea id="sum-edit-factor1-${p}" rows="2">${escHtml(factor1)}</textarea>
+      </div>
+      <div class="summary-edit-field">
+        <label>Factor 2</label>
+        <textarea id="sum-edit-factor2-${p}" rows="2">${escHtml(factor2)}</textarea>
+      </div>
+    </div>`);
+  });
+
+  panels.innerHTML=blocks.length?blocks.join(''):'<div class="sum-empty">수정할 데이터가 없습니다.</div>';
+  overlay.classList.add('open');
+}
+
+function closeSummaryEdit(){
+  const overlay=document.getElementById('summary-edit-overlay');
+  if(overlay)overlay.classList.remove('open');
+}
+
+function fillAutoSummaryProduct(prod){
+  const e=(allData[prod]||[]).find(x=>x.date===curDate);
+  if(!e)return;
+  const auto=getAutoSummaryContent(prod,e);
+  const c=document.getElementById('sum-edit-comment-'+prod);
+  const f1=document.getElementById('sum-edit-factor1-'+prod);
+  const f2=document.getElementById('sum-edit-factor2-'+prod);
+  if(c)c.value=auto.comment||'';
+  if(f1)f1.value=auto.factors[0]||'';
+  if(f2)f2.value=auto.factors[1]||'';
+}
+
+function saveSummaryEdits(){
+  if(!curDate)return;
+  const order=['WTI','Benzene','Styrene','Butadiene'];
+  let count=0;
+
+  order.forEach(p=>{
+    const e=(allData[p]||[]).find(x=>x.date===curDate);
+    if(!e)return;
+    const c=document.getElementById('sum-edit-comment-'+p);
+    const f1=document.getElementById('sum-edit-factor1-'+p);
+    const f2=document.getElementById('sum-edit-factor2-'+p);
+    if(!c||!f1||!f2)return;
+
+    const auto=getAutoSummaryContent(p,e);
+    const value={
+      comment:c.value.trim(),
+      factor1:f1.value.trim(),
+      factor2:f2.value.trim(),
+      updatedAt:new Date().toISOString()
+    };
+
+    // 자동값과 완전히 같으면 override 자체를 제거해서 다시 자동 모드로 유지
+    const sameComment=value.comment===(auto.comment||'');
+    const sameF1=value.factor1===(auto.factors[0]||'');
+    const sameF2=value.factor2===(auto.factors[1]||'');
+    if(sameComment&&sameF1&&sameF2){
+      deleteSummaryOverride(curDate,p);
+    }else{
+      setSummaryOverride(curDate,p,value);
+      count++;
+    }
+  });
+
+  if(!persistSummaryOverrides()){
+    toast('❌ 요약 수정 저장 실패','err');
+    return;
+  }
+  safeBuildDailySummary();
+  closeSummaryEdit();
+  toast(count?`✅ 요약 수동 수정 ${count}개 품목 저장`:'✅ 자동 요약 상태로 저장','ok');
+}
+
+function resetSummaryDate(){
+  if(!curDate)return;
+  if(!confirm(curDate+'의 수동 Summary 수정값을 모두 지우고 자동 요약으로 복원하시겠습니까?'))return;
+  delete summaryOverrides[curDate];
+  if(!persistSummaryOverrides()){toast('❌ 자동복원 실패','err');return;}
+  safeBuildDailySummary();
+  // 열린 모달도 자동값으로 다시 채움
+  ['WTI','Benzene','Styrene','Butadiene'].forEach(fillAutoSummaryProduct);
+  toast('↺ 이 날짜 Summary를 자동 요약으로 복원했습니다','ok');
+}
+
 function safeBuildDailySummary(){
   try{
     buildDailySummary();
@@ -708,26 +943,18 @@ function buildDailySummary(){
     const chg=e.change==null?'—':(Number(e.change)>0?'+':'')+Number(e.change).toFixed(2);
     const pct=e.changePct==null?'—':(Number(e.changePct)>0?'+':'')+Number(e.changePct).toFixed(2)+'%';
 
-    // Commentary가 Summary의 기준(원인)이고, Factor는 그 원인을 구체화하는 근거로 연결
-    const comment=pickSummaryCommentary(e.commentary,p,e.direction,165);
-    let factors=pickSummaryFactors(e.factors,p,e.direction,comment,2);
-
-    // 과거 데이터 등에서 commentary/factors가 비어 있으면 outlook을 최후 보조자료로만 사용
-    const shownComment=comment || trimSummaryText((e.factors||e.outlook||'').split(/\n/)[0]||'',165);
-    if(!factors.length && e.outlook && shownComment){
-      const fallback=pickSummaryFactors(e.outlook,p,e.direction,shownComment,1);
-      factors=fallback;
-    }
-
-    const factorHtml=factors.length
-      ?`<div class="sum-factors ${dirCls}">${factors.map(f=>`<span class="sum-factor">${escHtml(f)}</span>`).join('')}</div>`
+    const shown=getDisplayedSummaryContent(p,e);
+    const factorHtml=shown.factors.length
+      ?`<div class="sum-factors ${dirCls}">${shown.factors.map(f=>`<span class="sum-factor">${escHtml(f)}</span>`).join('')}</div>`
       :'';
+    const manualBadge=shown.isManual?'<span class="sum-manual-badge">수동</span>':'';
+
     return `<tr>
-      <td><div class="sum-prod-name">${names[p]}</div></td>
+      <td><div class="sum-prod-name">${names[p]}${manualBadge}</div></td>
       <td class="sum-num ${dirCls}">${Number(e.price).toLocaleString('en-US',{minimumFractionDigits:priceDigits,maximumFractionDigits:priceDigits})}</td>
       <td class="sum-num ${dirCls}">${chg}</td>
       <td class="sum-move ${dirCls}">${escHtml(e.direction||'보합')}<br>(${pct})</td>
-      <td><div class="sum-comment">${escHtml(shownComment||'코멘터리 없음')}</div>${factorHtml}</td>
+      <td><div class="sum-comment">${escHtml(shown.comment||'코멘터리 없음')}</div>${factorHtml}</td>
     </tr>`;
   }).join('');
 
