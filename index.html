@@ -710,8 +710,7 @@ table{max-width:100%;}
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
       <div style="font-family:var(--disp);font-size:28px;font-weight:900;" id="main-date">—</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-outline" onclick="dlImage()">📷 전체 이미지</button>
-        <button class="btn btn-outline" onclick="dlSummaryImage()">🖼 요약 이미지</button>
+        <button class="btn btn-outline" onclick="dlReportImage()">📷 보고 이미지</button>
         <button class="btn btn-outline" onclick="window.print()">🖨 PDF</button>
         <button class="btn btn-outline" onclick="copyMsg()">💬 메신저</button>
       </div>
@@ -1810,59 +1809,104 @@ function toast(m,t){
   e.style.background=t==='ok'?'#065F46':'#991B1B';
   setTimeout(()=>e.className='',3000);
 }
-function dlImage(){
-  // 임시로 grid를 4컬럼 가로 레이아웃으로 강제 후 캡처
-  const el=document.getElementById('grid');
-  const origStyle=el.style.cssText;
-  el.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:1400px;';
-  html2canvas(el,{backgroundColor:'#f9fafb',scale:2,width:1432,windowWidth:1600}).then(canvas=>{
-    el.style.cssText=origStyle;
-    const a=document.createElement('a');a.href=canvas.toDataURL();
-    a.download='DailyBrief_'+curDate+'.png';a.click();
-  }).catch(()=>el.style.cssText=origStyle);
-}
-function dlSummaryImage(){
+
+function dlReportImage(){
   if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
-  const src=document.getElementById('daily-summary-wrap');
-  if(!src){toast('요약 영역을 찾을 수 없습니다','err');return;}
 
-  // 화면 레이아웃/모바일 스크롤 상태와 무관하게 1400px 보고용 폭으로 복제하여 캡처
-  const clone=src.cloneNode(true);
-  clone.id='daily-summary-capture';
-  clone.style.position='fixed';
-  clone.style.left='-20000px';
-  clone.style.top='0';
-  clone.style.width='1400px';
-  clone.style.maxWidth='none';
-  clone.style.background='#fff';
-  clone.style.boxShadow='none';
-  clone.style.borderRadius='12px';
-  const sc=clone.querySelector('.daily-summary-scroll');
-  if(sc)sc.style.overflow='visible';
-  const tbl=clone.querySelector('.daily-summary-table');
-  if(tbl){tbl.style.minWidth='0';tbl.style.width='100%';}
-  document.body.appendChild(clone);
+  const summary=document.getElementById('daily-summary-wrap');
+  const grid=document.getElementById('grid');
+  const weekly=document.querySelector('.wk-wrap');
 
-  html2canvas(clone,{
-    backgroundColor:'#ffffff',
+  if(!summary||!grid||!weekly){
+    toast('❌ 이미지 저장 대상 영역을 찾지 못했습니다','err');
+    return;
+  }
+
+  // 현재 화면(특히 모바일) 레이아웃과 무관하게 보고용 고정 폭으로 합성 캡처
+  const cap=document.createElement('div');
+  cap.id='daily-report-capture';
+  cap.style.position='fixed';
+  cap.style.left='-20000px';
+  cap.style.top='0';
+  cap.style.width='1432px';
+  cap.style.maxWidth='none';
+  cap.style.background='#F9FAFB';
+  cap.style.padding='18px 16px 22px';
+  cap.style.fontFamily='var(--sans)';
+  cap.style.color='#111827';
+  cap.style.boxSizing='border-box';
+
+  const dateTitle=document.createElement('div');
+  dateTitle.style.fontFamily='var(--disp)';
+  dateTitle.style.fontSize='28px';
+  dateTitle.style.fontWeight='900';
+  dateTitle.style.margin='0 0 12px 2px';
+  dateTitle.textContent=curDate||'—';
+  cap.appendChild(dateTitle);
+
+  const summaryClone=summary.cloneNode(true);
+  summaryClone.style.width='1400px';
+  summaryClone.style.maxWidth='none';
+  summaryClone.style.margin='0 0 16px';
+  summaryClone.style.background='#fff';
+  summaryClone.style.boxShadow='none';
+  summaryClone.style.borderRadius='12px';
+  const summaryScroll=summaryClone.querySelector('.daily-summary-scroll');
+  if(summaryScroll)summaryScroll.style.overflow='visible';
+  const summaryTable=summaryClone.querySelector('.daily-summary-table');
+  if(summaryTable){
+    summaryTable.style.width='100%';
+    summaryTable.style.minWidth='0';
+    summaryTable.style.tableLayout='fixed';
+  }
+  cap.appendChild(summaryClone);
+
+  const gridClone=grid.cloneNode(true);
+  gridClone.style.display='grid';
+  gridClone.style.gridTemplateColumns='repeat(4,1fr)';
+  gridClone.style.gap='16px';
+  gridClone.style.width='1400px';
+  gridClone.style.maxWidth='none';
+  gridClone.style.margin='0 0 16px';
+  cap.appendChild(gridClone);
+
+  const weeklyClone=weekly.cloneNode(true);
+  weeklyClone.style.width='1400px';
+  weeklyClone.style.maxWidth='none';
+  weeklyClone.style.overflow='visible';
+  weeklyClone.style.background='#fff';
+  weeklyClone.style.boxShadow='none';
+  weeklyClone.style.borderRadius='12px';
+  const weeklyTable=weeklyClone.querySelector('.wk-table');
+  if(weeklyTable){
+    weeklyTable.style.width='100%';
+    weeklyTable.style.maxWidth='100%';
+    weeklyTable.style.tableLayout='fixed';
+  }
+  cap.appendChild(weeklyClone);
+
+  document.body.appendChild(cap);
+
+  html2canvas(cap,{
+    backgroundColor:'#F9FAFB',
     scale:2,
-    width:1400,
+    width:1432,
     windowWidth:1600,
     useCORS:true
   }).then(canvas=>{
-    clone.remove();
+    cap.remove();
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
-    a.download='DailySummary_'+curDate+'.png';
+    a.download='DailyBrief_Report_'+curDate+'.png';
     a.click();
-    toast('✅ 요약 이미지 저장 완료','ok');
+    toast('✅ 보고 이미지 저장 완료','ok');
   }).catch(err=>{
-    console.error('Summary image error:',err);
-    clone.remove();
-    toast('❌ 요약 이미지 저장 실패','err');
+    console.error('Report image error:',err);
+    cap.remove();
+    toast('❌ 보고 이미지 저장 실패','err');
   });
 }
-function copyMsg(){
+function copyMsg(function copyMsg(){
   if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
 
   const shortName={WTI:'WTI',Styrene:'SM',Benzene:'BZ',Butadiene:'BD'};
