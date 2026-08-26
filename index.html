@@ -1356,10 +1356,9 @@ function buildDailySummary(){
     const factorHtml=shown.factors.length
       ?`<div class="sum-factors ${dirCls}">${shown.factors.map(f=>`<span class="sum-factor">${escHtml(f)}</span>`).join('')}</div>`
       :'';
-    const manualBadge=shown.isManual?'<span class="sum-manual-badge">수동</span>':'';
 
     return `<tr>
-      <td data-label="품목"><div class="sum-prod-name">${names[p]}${manualBadge}</div></td>
+      <td data-label="품목"><div class="sum-prod-name">${names[p]}</div></td>
       <td data-label="가격" class="sum-num ${dirCls}">${Number(e.price).toLocaleString('en-US',{minimumFractionDigits:priceDigits,maximumFractionDigits:priceDigits})}</td>
       <td data-label="변동폭" class="sum-num ${dirCls}">${chg}</td>
       <td data-label="등락" class="sum-move ${dirCls}">${escHtml(e.direction||'보합')}<br>(${pct})</td>
