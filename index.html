@@ -153,6 +153,170 @@ table{max-width:100%;}
 .summary-edit-field textarea:focus{border-color:#111827;box-shadow:0 0 0 2px rgba(17,24,39,.06);}
 .summary-edit-foot{padding:14px 22px;border-top:1px solid #E5E7EB;background:#fff;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 
+
+/* ── 보고 이미지/PDF 전용 2×2 컴팩트 카드 ── */
+/* 실제 화면에는 사용하지 않고, 저장용 캡처 DOM에서만 사용 */
+.report-compact-grid{
+  width:1400px;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:14px;
+  margin:0 0 16px;
+}
+.report-compact-card{
+  background:#fff;
+  border:1px solid var(--bd);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:none;
+}
+.report-compact-bar{height:6px;}
+.report-compact-bar.wti{background:var(--wti);}
+.report-compact-bar.sm{background:var(--sm);}
+.report-compact-bar.bz{background:var(--bz);}
+.report-compact-bar.bd{background:var(--bd2);}
+.report-compact-body{padding:12px 14px 13px;}
+.report-compact-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:8px;
+}
+.report-compact-left{min-width:0;flex:1;}
+.report-compact-prod{
+  font-family:var(--disp);
+  font-size:18px;
+  font-weight:900;
+  line-height:1.1;
+  margin-bottom:6px;
+}
+.report-compact-prod.wti{color:var(--wti);}
+.report-compact-prod.sm{color:var(--sm);}
+.report-compact-prod.bz{color:var(--bz);}
+.report-compact-prod.bd{color:var(--bd2);}
+.report-compact-meta{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.report-compact-price{
+  font-family:var(--disp);
+  font-size:28px;
+  font-weight:900;
+  line-height:1;
+}
+.report-compact-delta{
+  font-family:var(--mono);
+  font-size:11px;
+  font-weight:800;
+  line-height:1.35;
+}
+.report-compact-dir{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:20px;
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.report-compact-dir.up{background:var(--up);}
+.report-compact-dir.dn{background:var(--dn);}
+.report-compact-dir.flt{background:var(--g3);}
+.report-compact-comment{
+  font-size:12px;
+  font-weight:900;
+  color:#111827;
+  line-height:1.5;
+  margin-bottom:6px;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+.report-compact-factors{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.report-compact-factor{
+  font-size:10.5px;
+  font-weight:700;
+  line-height:1.45;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+.report-compact-factor.up{color:var(--up);}
+.report-compact-factor.dn{color:var(--dn);}
+.report-compact-factor.flt{color:var(--flt);}
+.report-compact-empty{
+  font-size:10px;
+  color:#9CA3AF;
+}
+
+.report-compact-section-label{
+  display:inline-block;
+  background:var(--highlight-bg);
+  border:1px solid #111827;
+  border-radius:3px;
+  padding:2px 6px;
+  margin:1px 0 5px;
+  font-family:var(--mono);
+  font-size:8.5px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.report-compact-comment-full{
+  font-size:11.5px;
+  font-weight:850;
+  color:#111827;
+  line-height:1.48;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+.report-compact-detail-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);
+  gap:8px;
+  margin-top:8px;
+  align-items:start;
+}
+.report-compact-detail-box{
+  min-width:0;
+  background:#F9FAFB;
+  border:1px solid #E5E7EB;
+  border-radius:7px;
+  padding:7px 8px 8px;
+}
+.report-compact-factor-full{
+  display:flex;
+  gap:5px;
+  align-items:flex-start;
+  font-size:9.5px;
+  font-weight:650;
+  color:#1F2937;
+  line-height:1.4;
+  margin-top:2px;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+.report-compact-factor-dot{
+  font-weight:900;
+  flex:0 0 auto;
+}
+.report-compact-factor-dot.up{color:var(--up);}
+.report-compact-factor-dot.dn{color:var(--dn);}
+.report-compact-factor-dot.flt{color:var(--flt);}
+.report-compact-outlook{
+  font-size:9.5px;
+  font-weight:650;
+  color:#374151;
+  line-height:1.42;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+
 /* ── 주간 테이블 ── */
 .wk-wrap{background:var(--white);border:1px solid var(--bd);border-radius:14px;padding:20px;box-shadow:var(--sh);}
 .wk-title{font-family:var(--sans);font-size:16px;font-weight:900;letter-spacing:.02em;color:var(--g1);margin-bottom:14px;}
@@ -688,6 +852,7 @@ table{max-width:100%;}
     <div class="hdr-right">
       <button class="btn btn-outline" onclick="loadData()">↺ 새로고침</button>
       <button class="btn btn-outline" onclick="openSummaryEdit()">✎ 요약 수정</button>
+      <button class="btn btn-outline" onclick="dlSummaryImage()">🖼 요약 이미지</button>
       <button class="btn btn-primary" onclick="openModal()">+ NEW ENTRY</button>
     </div>
   </div>
@@ -710,8 +875,8 @@ table{max-width:100%;}
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
       <div style="font-family:var(--disp);font-size:28px;font-weight:900;" id="main-date">—</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-outline" onclick="dlReportImage()">📷 보고 이미지</button>
-        <button class="btn btn-outline" onclick="window.print()">🖨 PDF</button>
+        <button class="btn btn-outline" onclick="dlReportImage()">📷 상세 이미지</button>
+        <button class="btn btn-outline" onclick="dlReportPdf()">🖨 PDF</button>
         <button class="btn btn-outline" onclick="copyMsg()">💬 메신저</button>
       </div>
     </div>
@@ -1809,19 +1974,79 @@ function toast(m,t){
   setTimeout(()=>e.className='',3000);
 }
 
-function dlReportImage(){
-  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
 
+function reportEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,ch=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+function reportText(v){
+  return reportEsc(String(v||'').trim()).replace(/\n/g,'<br>');
+}
+function compactTrim(v,max=165){
+  return trimSummaryText(String(v||''),max);
+}
+function compactFactorTrim(v,max=82){
+  return trimSummaryText(String(v||''),max);
+}
+function renderCompactReportCard(prod,entry){
+  if(!entry)return'';
+  const cls=PCLS[prod];
+  const dir=entry.direction==='상승'?'up':entry.direction==='하락'?'dn':'flt';
+
+  const price=Number(entry.price||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const change=entry.change==null?'—':(Number(entry.change)>=0?'+':'')+Number(entry.change).toFixed(2)+' USD';
+  const pct=entry.changePct==null?'—':(Number(entry.changePct)>=0?'+':'')+Number(entry.changePct).toFixed(2)+'%';
+
+  // 출력용 카드에서는 원본 상세 내용을 생략하지 않음
+  const commentary=String(entry.commentary||'').trim() || '코멘터리 없음';
+  const outlook=String(entry.outlook||'').trim() || '전망 내용 없음';
+
+  let factors=String(entry.factors||'')
+    .split(/\n+|\s+\/\s+/)
+    .map(x=>x.replace(/^[•\-*]\s*/,'').trim())
+    .filter(Boolean);
+
+  const factorHtml=factors.length
+    ? factors.map(f=>`<div class="report-compact-factor-full"><span class="report-compact-factor-dot ${dir}">•</span><span>${reportEsc(f)}</span></div>`).join('')
+    : '<div class="report-compact-empty">변동요인 없음</div>';
+
+  return `<div class="report-compact-card">
+    <div class="report-compact-bar ${cls}"></div>
+    <div class="report-compact-body">
+      <div class="report-compact-head">
+        <div class="report-compact-left">
+          <div class="report-compact-prod ${cls}">${reportEsc(prod)}</div>
+          <div class="report-compact-meta">
+            <div class="report-compact-price ${dir}">${price}</div>
+            <div class="report-compact-delta ${dir}">${change} / ${pct}</div>
+          </div>
+        </div>
+        <div class="report-compact-dir ${dir}">${reportEsc(entry.direction||'보합')}</div>
+      </div>
+
+      <div class="report-compact-section-label">Commentary</div>
+      <div class="report-compact-comment-full">${reportText(commentary)}</div>
+
+      <div class="report-compact-detail-row">
+        <div class="report-compact-detail-box">
+          <div class="report-compact-section-label">Market Factors</div>
+          ${factorHtml}
+        </div>
+        <div class="report-compact-detail-box">
+          <div class="report-compact-section-label">Outlook</div>
+          <div class="report-compact-outlook">${reportText(outlook)}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildCompactReportCapture(){
   const summary=document.getElementById('daily-summary-wrap');
-  const grid=document.getElementById('grid');
   const weekly=document.querySelector('.wk-wrap');
+  if(!summary||!weekly)return null;
 
-  if(!summary||!grid||!weekly){
-    toast('❌ 이미지 저장 대상 영역을 찾지 못했습니다','err');
-    return;
-  }
-
-  // 현재 화면(특히 모바일) 레이아웃과 무관하게 보고용 고정 폭으로 합성 캡처
   const cap=document.createElement('div');
   cap.id='daily-report-capture';
   cap.style.position='fixed';
@@ -1854,12 +2079,83 @@ function dlReportImage(){
   if(summaryScroll)summaryScroll.style.overflow='visible';
   const summaryTable=summaryClone.querySelector('.daily-summary-table');
   if(summaryTable){
+    summaryTable.style.display='table';
     summaryTable.style.width='100%';
     summaryTable.style.minWidth='0';
     summaryTable.style.tableLayout='fixed';
   }
+  summaryClone.querySelectorAll('.daily-summary-table tbody').forEach(x=>x.style.display='table-row-group');
+  summaryClone.querySelectorAll('.daily-summary-table tr').forEach(x=>{
+    x.style.display='table-row';
+    x.style.margin='0';
+    x.style.border='0';
+  });
+  summaryClone.querySelectorAll('.daily-summary-table td').forEach(x=>{
+    x.style.display='table-cell';
+    x.style.width='';
+    x.style.maxWidth='';
+    x.style.textAlign='';
+    x.style.position='';
+    x.style.paddingLeft='';
+  });
   cap.appendChild(summaryClone);
 
+  const detailGrid=document.createElement('div');
+  detailGrid.className='report-compact-grid';
+  detailGrid.innerHTML=PRODS.map(p=>{
+    const e=(allData[p]||[]).find(x=>x.date===curDate);
+    return renderCompactReportCard(p,e);
+  }).join('');
+  cap.appendChild(detailGrid);
+
+  const weeklyClone=weekly.cloneNode(true);
+  weeklyClone.style.width='1400px';
+  weeklyClone.style.maxWidth='none';
+  weeklyClone.style.overflow='visible';
+  weeklyClone.style.background='#fff';
+  weeklyClone.style.boxShadow='none';
+  weeklyClone.style.borderRadius='12px';
+  const weeklyTable=weeklyClone.querySelector('.wk-table');
+  if(weeklyTable){
+    weeklyTable.style.width='100%';
+    weeklyTable.style.maxWidth='100%';
+    weeklyTable.style.tableLayout='fixed';
+  }
+  cap.appendChild(weeklyClone);
+
+  document.body.appendChild(cap);
+  return cap;
+}
+
+
+function buildDetailImageCapture(){
+  const grid=document.getElementById('grid');
+  const weekly=document.querySelector('.wk-wrap');
+  if(!grid||!weekly)return null;
+
+  const cap=document.createElement('div');
+  cap.id='daily-detail-capture';
+  cap.style.position='fixed';
+  cap.style.left='-20000px';
+  cap.style.top='0';
+  cap.style.width='1432px';
+  cap.style.maxWidth='none';
+  cap.style.background='#F9FAFB';
+  cap.style.padding='18px 16px 22px';
+  cap.style.fontFamily='var(--sans)';
+  cap.style.color='#111827';
+  cap.style.boxSizing='border-box';
+
+  const dateTitle=document.createElement('div');
+  dateTitle.style.fontFamily='var(--disp)';
+  dateTitle.style.fontSize='28px';
+  dateTitle.style.fontWeight='900';
+  dateTitle.style.margin='0 0 12px 2px';
+  dateTitle.textContent=curDate||'—';
+  cap.appendChild(dateTitle);
+
+  // 상세 이미지는 실제 화면 카드 디자인을 그대로 유지하고,
+  // 4품목이 현재처럼 4열 가로 배치된 상태로 저장
   const gridClone=grid.cloneNode(true);
   gridClone.style.display='grid';
   gridClone.style.gridTemplateColumns='repeat(4,1fr)';
@@ -1885,6 +2181,109 @@ function dlReportImage(){
   cap.appendChild(weeklyClone);
 
   document.body.appendChild(cap);
+  return cap;
+}
+function captureDetailImageCanvas(){
+  const cap=buildDetailImageCapture();
+  if(!cap)return Promise.reject(new Error('상세 이미지 영역 생성 실패'));
+
+  return html2canvas(cap,{
+    backgroundColor:'#F9FAFB',
+    scale:2,
+    width:1432,
+    windowWidth:1600,
+    useCORS:true
+  }).then(canvas=>{
+    cap.remove();
+    return canvas;
+  }).catch(err=>{
+    cap.remove();
+    throw err;
+  });
+}
+
+function captureCompactReportCanvas(){
+  const cap=buildCompactReportCapture();
+  if(!cap)return Promise.reject(new Error('보고서 영역 생성 실패'));
+
+  return html2canvas(cap,{
+    backgroundColor:'#F9FAFB',
+    scale:2,
+    width:1432,
+    windowWidth:1600,
+    useCORS:true
+  }).then(canvas=>{
+    cap.remove();
+    return canvas;
+  }).catch(err=>{
+    cap.remove();
+    throw err;
+  });
+}
+
+
+function dlSummaryImage(){
+  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
+
+  const src=document.getElementById('daily-summary-wrap');
+  if(!src){toast('❌ 요약 영역을 찾지 못했습니다','err');return;}
+
+  // 현재 모바일/PC 화면 상태와 무관하게 보고용 가로폭으로 요약만 캡처
+  const cap=document.createElement('div');
+  cap.style.position='fixed';
+  cap.style.left='-20000px';
+  cap.style.top='0';
+  cap.style.width='1432px';
+  cap.style.maxWidth='none';
+  cap.style.background='#F9FAFB';
+  cap.style.padding='18px 16px 20px';
+  cap.style.boxSizing='border-box';
+  cap.style.fontFamily='var(--sans)';
+  cap.style.color='#111827';
+
+  const dateTitle=document.createElement('div');
+  dateTitle.style.fontFamily='var(--disp)';
+  dateTitle.style.fontSize='28px';
+  dateTitle.style.fontWeight='900';
+  dateTitle.style.margin='0 0 12px 2px';
+  dateTitle.textContent=curDate||'—';
+  cap.appendChild(dateTitle);
+
+  const clone=src.cloneNode(true);
+  clone.style.width='1400px';
+  clone.style.maxWidth='none';
+  clone.style.background='#fff';
+  clone.style.boxShadow='none';
+  clone.style.borderRadius='12px';
+
+  const sc=clone.querySelector('.daily-summary-scroll');
+  if(sc)sc.style.overflow='visible';
+
+  const tbl=clone.querySelector('.daily-summary-table');
+  if(tbl){
+    tbl.style.display='table';
+    tbl.style.width='100%';
+    tbl.style.minWidth='0';
+    tbl.style.tableLayout='fixed';
+  }
+
+  clone.querySelectorAll('.daily-summary-table tbody').forEach(x=>x.style.display='table-row-group');
+  clone.querySelectorAll('.daily-summary-table tr').forEach(x=>{
+    x.style.display='table-row';
+    x.style.margin='0';
+    x.style.border='0';
+  });
+  clone.querySelectorAll('.daily-summary-table td').forEach(x=>{
+    x.style.display='table-cell';
+    x.style.width='';
+    x.style.maxWidth='';
+    x.style.textAlign='';
+    x.style.position='';
+    x.style.paddingLeft='';
+  });
+
+  cap.appendChild(clone);
+  document.body.appendChild(cap);
 
   html2canvas(cap,{
     backgroundColor:'#F9FAFB',
@@ -1896,15 +2295,78 @@ function dlReportImage(){
     cap.remove();
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
-    a.download='DailyBrief_Report_'+curDate+'.png';
+    a.download='DailySummary_'+curDate+'.png';
     a.click();
-    toast('✅ 보고 이미지 저장 완료','ok');
+    toast('✅ 요약 이미지 저장 완료','ok');
   }).catch(err=>{
-    console.error('Report image error:',err);
+    console.error('Summary image error:',err);
     cap.remove();
-    toast('❌ 보고 이미지 저장 실패','err');
+    toast('❌ 요약 이미지 저장 실패','err');
   });
 }
+
+function dlReportImage(){
+  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
+
+  captureDetailImageCanvas().then(canvas=>{
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download='DailyDetail_'+curDate+'.png';
+    a.click();
+    toast('✅ 상세 이미지 저장 완료','ok');
+  }).catch(err=>{
+    console.error('Detail image error:',err);
+    toast('❌ 상세 이미지 저장 실패','err');
+  });
+}
+
+function dlReportPdf(){
+  if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
+
+  captureCompactReportCanvas().then(canvas=>{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4',compress:true});
+
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    const margin=8;
+    const usableW=pageW-(margin*2);
+    const usableH=pageH-(margin*2);
+
+    const pxPerMm=canvas.width/usableW;
+    const slicePx=Math.floor(usableH*pxPerMm);
+
+    let y=0;
+    let page=0;
+    while(y<canvas.height){
+      const h=Math.min(slicePx,canvas.height-y);
+      const slice=document.createElement('canvas');
+      slice.width=canvas.width;
+      slice.height=h;
+
+      const ctx=slice.getContext('2d');
+      ctx.fillStyle='#F9FAFB';
+      ctx.fillRect(0,0,slice.width,slice.height);
+      ctx.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
+
+      const img=slice.toDataURL('image/jpeg',0.96);
+      const drawH=h/pxPerMm;
+
+      if(page>0)pdf.addPage('a4','landscape');
+      pdf.addImage(img,'JPEG',margin,margin,usableW,drawH,undefined,'FAST');
+
+      y+=h;
+      page++;
+    }
+
+    pdf.save('DailyBrief_Report_'+curDate+'.pdf');
+    toast('✅ 보고 PDF 저장 완료','ok');
+  }).catch(err=>{
+    console.error('Report PDF error:',err);
+    toast('❌ PDF 저장 실패','err');
+  });
+}
+
 function copyMsg(){
   if(!curDate){toast('날짜를 먼저 선택하세요','err');return;}
 
