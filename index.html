@@ -1857,12 +1857,12 @@ function setTrendRange(n){
   renderTrendCharts();
 }
 
-function trendSeries(prod){
+function trendSeries(prod,useRange=true){
   const rows=(allData[prod]||[])
     .map(e=>({date:String(e.date||'').replace(/\./g,'-'),price:Number(e.price)}))
     .filter(e=>e.date&&Number.isFinite(e.price)&&e.price>0)
     .sort((a,b)=>a.date.localeCompare(b.date));
-  return trendRange>0?rows.slice(-trendRange):rows;
+  return useRange&&trendRange>0?rows.slice(-trendRange):rows;
 }
 
 function rollingMean(arr,n,i){
@@ -1930,7 +1930,8 @@ function renderTrendCharts(){
   }).join('');
 
   valid.forEach(prod=>{
-    const rows=calcTrendIndicators(trendSeries(prod));
+    const fullRows=calcTrendIndicators(trendSeries(prod,false));
+    const rows=trendRange>0?fullRows.slice(-trendRange):fullRows;
     const canvas=document.getElementById('trend-chart-'+TREND_CLASS[prod]);
     if(!canvas||!rows.length)return;
     const labels=rows.map(r=>trendDateLabel(r.date));
