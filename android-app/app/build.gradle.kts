@@ -25,7 +25,8 @@ val decodeLamIcon by tasks.registering {
         ).forEach { density ->
             val dir = File(root, density)
             dir.mkdirs()
-            File(dir, "ic_launcher.jpg").writeBytes(bytes)\n            File(dir, "ic_launcher_art.jpg").writeBytes(bytes)
+            File(dir, "ic_launcher.jpg").writeBytes(bytes)
+            File(dir, "ic_launcher_art.jpg").writeBytes(bytes)
         }
     }
 }
