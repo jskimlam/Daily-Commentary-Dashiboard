@@ -70,7 +70,8 @@ public class MainActivity extends Activity {
 
     private void configureWebView() {
         WebSettings s = webView.getSettings();
-        s.setJavaScriptEnabled(true);\n        s.setTextZoom(100);
+        s.setJavaScriptEnabled(true);
+        s.setTextZoom(100);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
         s.setLoadWithOverviewMode(true);
