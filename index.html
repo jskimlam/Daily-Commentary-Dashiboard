@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Daily Chemical Brief</title>
+<title>LAM Daily · Daily Chemical Brief</title>
+<link rel="icon" type="image/svg+xml" href="assets/lam_daily_icon.svg">
+<link rel="apple-touch-icon" href="assets/lam_daily_icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=DM+Mono:wght@400;500&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,7 +31,7 @@ table{max-width:100%;}
 .hdr{background:var(--white);border-bottom:3px solid var(--lotte);position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.08);}
 .hdr-inner{max-width:1600px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:20px;}
 .hdr-brand{display:flex;align-items:center;gap:14px;flex-shrink:0;}
-.hdr-mark{width:50px;height:38px;background:var(--brand-orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;font-weight:900;color:#000;border:2px solid #000;}
+.hdr-mark{width:44px;height:44px;border-radius:11px;display:block;object-fit:cover;border:1px solid #D1D5DB;box-shadow:0 2px 7px rgba(0,0,0,.12);flex-shrink:0;}
 .hdr-title{font-family:var(--disp);font-size:18px;font-weight:900;color:#000;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;}
 .hdr-title span{color:var(--lotte);}
 .hdr-title span.copyright-text{color:#000 !important;}
@@ -896,7 +898,7 @@ table{max-width:100%;}
 <header class="hdr">
   <div class="hdr-inner">
     <div class="hdr-brand">
-      <div class="hdr-mark">LAM</div>
+      <img class="hdr-mark" src="assets/lam_daily_icon.svg" alt="LAM DAILY">
       <div class="hdr-title">Daily <span>Chemical</span> Brief
         <span class="copyright-text">created by JSKIM of LAM (첨단구매1팀)</span>
       </div>
@@ -2194,13 +2196,20 @@ function dlTrendA4Png(){
       logging:false
     }).then(canvas=>{
       page.remove();
-      const a=document.createElement('a');
-      a.href=canvas.toDataURL('image/png');
-      a.download='DailyPriceTrend_A4_'+latestTrendDate()+'.png';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast('✅ A4 세로 PNG 저장 완료','ok');
+      const dataUrl=canvas.toDataURL('image/png');
+      const fileName='DailyPriceTrend_A4_'+latestTrendDate()+'.png';
+      if(window.LAMAndroid&&typeof window.LAMAndroid.saveBase64File==='function'){
+        window.LAMAndroid.saveBase64File(dataUrl,fileName);
+        toast('✅ A4 세로 PNG 저장 요청 완료','ok');
+      }else{
+        const a=document.createElement('a');
+        a.href=dataUrl;
+        a.download=fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        toast('✅ A4 세로 PNG 저장 완료','ok');
+      }
     }).catch(err=>{
       console.error('A4 trend PNG error:',err);
       page.remove();
