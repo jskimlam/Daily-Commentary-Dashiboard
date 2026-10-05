@@ -1,3 +1,6 @@
+import java.io.File
+import java.util.Base64
+
 plugins {
     id("com.android.application")
 }
@@ -11,7 +14,7 @@ val decodeLamIcon by tasks.registering {
 
     doLast {
         val encoded = source.readText().trim()
-        val bytes = java.util.Base64.getDecoder().decode(encoded)
+        val bytes = Base64.getDecoder().decode(encoded)
         val root = generatedIconResDir.get().asFile
         listOf(
             "mipmap-mdpi",
@@ -20,9 +23,9 @@ val decodeLamIcon by tasks.registering {
             "mipmap-xxhdpi",
             "mipmap-xxxhdpi"
         ).forEach { density ->
-            val dir = java.io.File(root, density)
+            val dir = File(root, density)
             dir.mkdirs()
-            java.io.File(dir, "ic_launcher.jpg").writeBytes(bytes)
+            File(dir, "ic_launcher.jpg").writeBytes(bytes)
         }
     }
 }
