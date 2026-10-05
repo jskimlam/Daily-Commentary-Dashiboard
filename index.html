@@ -1024,13 +1024,68 @@ function selDate(d){
   buildMiniWkTable();
 }
 
+// ── 확장 섹션(5·6) 저장 호환 ──
+// 기존 GAS/Google Sheet는 1~4번 필드 구조를 유지하므로,
+// 5·6번은 outlook 셀 내부에 명시적 마커로 함께 저장하고 로드시 다시 분리한다.
+// 향후 백엔드가 별도 필드를 지원해도 additionalInfo / aiAnalysis 값을 우선 사용한다.
+const EXT5='[[SECTION5_ADDITIONAL_INFO]]';
+const EXT6='[[SECTION6_AI_ANALYSIS]]';
+
+function decodeExtendedOutlook(raw){
+  const src=String(raw||'');
+  const i5=src.indexOf(EXT5), i6=src.indexOf(EXT6);
+  let outlook=src, additionalInfo='', aiAnalysis='';
+  if(i5>=0){
+    outlook=src.slice(0,i5).trim();
+    if(i6>i5){
+      additionalInfo=src.slice(i5+EXT5.length,i6).trim();
+      aiAnalysis=src.slice(i6+EXT6.length).trim();
+    }else{
+      additionalInfo=src.slice(i5+EXT5.length).trim();
+    }
+  }else if(i6>=0){
+    outlook=src.slice(0,i6).trim();
+    aiAnalysis=src.slice(i6+EXT6.length).trim();
+  }
+  return {outlook,additionalInfo,aiAnalysis};
+}
+
+function encodeExtendedOutlook(outlook,additionalInfo,aiAnalysis){
+  const o=String(outlook||'').trim();
+  const a=String(additionalInfo||'').trim();
+  const ai=String(aiAnalysis||'').trim();
+  let out=o;
+  if(a)out+=(out?'\n\n':'')+EXT5+'\n'+a;
+  if(ai)out+=(out?'\n\n':'')+EXT6+'\n'+ai;
+  return out;
+}
+
+function normalizeExtendedEntry(entry){
+  if(!entry)return entry;
+  const d=decodeExtendedOutlook(entry.outlook||'');
+  return {
+    ...entry,
+    outlook:d.outlook,
+    additionalInfo:String(entry.additionalInfo||entry.additional||entry.additional_info||d.additionalInfo||'').trim(),
+    aiAnalysis:String(entry.aiAnalysis||entry.ai_analysis||entry.ai_outlook||d.aiAnalysis||'').trim()
+  };
+}
+
+function normalizeExtendedDataset(data){
+  const out={};
+  Object.keys(data||{}).forEach(k=>{
+    out[k]=(data[k]||[]).map(normalizeExtendedEntry);
+  });
+  return out;
+}
+
 // ── 데이터 로드 ──
 async function loadData(){
   try{
     const res=await fetch(GAS+'?action=load');
     const json=await res.json();
     if(!json.success)throw new Error(json.message);
-    allData=json.data; allDates=json.dates;
+    allData=normalizeExtendedDataset(json.data||{}); allDates=json.dates||[];
     buildArc();
     if(!curDate&&allDates.length>0)curDate=allDates[0];
     if(curDate)selDate(curDate);
@@ -1073,6 +1128,10 @@ function renderCard(prod,entry,date){
     <div class="section-body-text">${entry.factors.replace(/\n/g,'<br>')}</div>`:''}
     ${entry.outlook?`<div class="section-label-box"><span class="section-label-text">Outlook</span></div>
     <div class="section-body-text">${entry.outlook.replace(/\n/g,'<br>')}</div>`:''}
+    ${entry.additionalInfo?`<div class="section-label-box"><span class="section-label-text">Additional Information · 추가 정보</span></div>
+    <div class="section-body-text">${entry.additionalInfo.replace(/\n/g,'<br>')}</div>`:''}
+    ${entry.aiAnalysis?`<div class="section-label-box"><span class="section-label-text">AI Analysis & Forecast · AI 분석 의견 및 예측 전망</span></div>
+    <div class="section-body-text text-bold">${entry.aiAnalysis.replace(/\n/g,'<br>')}</div>`:''}
   </div>`;
 }
 
@@ -1658,6 +1717,8 @@ function buildPanels(){
       <div class="pfield"><label>코멘터리</label><textarea id="f-co-${p}" rows="3" placeholder="자동 추출 후 수정 가능"></textarea></div>
       <div class="pfield"><label>변동요인</label><textarea id="f-fa-${p}" rows="5" placeholder="자동 추출 후 수정 가능"></textarea></div>
       <div class="pfield"><label>결론 및 전망</label><textarea id="f-ou-${p}" rows="2" placeholder="자동 추출 후 수정 가능"></textarea></div>
+      <div class="pfield"><label>추가 정보</label><textarea id="f-ad-${p}" rows="4" placeholder="5. 추가 정보 자동 추출 후 수정 가능"></textarea></div>
+      <div class="pfield"><label>AI 분석 의견 및 예측 전망</label><textarea id="f-ai-${p}" rows="5" placeholder="6. AI 분석 의견 및 예측 전망 자동 추출 후 수정 가능"></textarea></div>
     </div>`).join('');
 }
 
@@ -1686,9 +1747,12 @@ function openEditModal(prod,date){
   document.getElementById('f-pct-'+prod).value=entry.changePct;
   document.getElementById('f-date-'+prod).value=entry.date.replace(/\./g,'-');
   document.getElementById('f-dir-'+prod).value=entry.direction;
-  document.getElementById('f-co-'+prod).value=entry.commentary||'';
-  document.getElementById('f-fa-'+prod).value=entry.factors||'';
-  document.getElementById('f-ou-'+prod).value=entry.outlook||'';
+  const ext=normalizeExtendedEntry(entry);
+  document.getElementById('f-co-'+prod).value=ext.commentary||'';
+  document.getElementById('f-fa-'+prod).value=ext.factors||'';
+  document.getElementById('f-ou-'+prod).value=ext.outlook||'';
+  document.getElementById('f-ad-'+prod).value=ext.additionalInfo||'';
+  document.getElementById('f-ai-'+prod).value=ext.aiAnalysis||'';
 }
 
 function closeModal(){document.getElementById('overlay').classList.remove('open');}
@@ -1734,7 +1798,13 @@ async function doSaveAll(){
       direction:document.getElementById('f-dir-'+p).value,
       commentary:document.getElementById('f-co-'+p).value.trim(),
       factors:document.getElementById('f-fa-'+p).value.trim(),
-      outlook:document.getElementById('f-ou-'+p).value.trim()
+      outlook:encodeExtendedOutlook(
+        document.getElementById('f-ou-'+p).value.trim(),
+        document.getElementById('f-ad-'+p).value.trim(),
+        document.getElementById('f-ai-'+p).value.trim()
+      ),
+      additionalInfo:document.getElementById('f-ad-'+p).value.trim(),
+      aiAnalysis:document.getElementById('f-ai-'+p).value.trim()
     };
     const action=isEdit?'edit':'save';
     const payload={sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
@@ -1894,7 +1964,18 @@ function parseBriefing(txt, prod){
 
   // ── 4. 결론 및 전망 ──
   const b4=getBullets(getSection('결론 및 전망'));
-  if(b4.length>0)f.outlook=b4[0];
+  if(b4.length>0)f.outlook=b4.join('\n');
+
+  // ── 5. 추가 정보 ──
+  let b5=getBullets(getSection('추가 정보'));
+  if(b5.length===0)b5=getBullets(getSection('추가정보'));
+  if(b5.length>0)f.additionalInfo=b5.join('\n');
+
+  // ── 6. AI 분석 의견 및 예측 전망 ──
+  let b6=getBullets(getSection('AI 분석 의견 및 예측 전망'));
+  if(b6.length===0)b6=getBullets(getSection('AI 분석'));
+  if(b6.length===0)b6=getBullets(getSection('AI 전망'));
+  if(b6.length>0)f.aiAnalysis=b6.join('\n');
 
   return f;
 }
@@ -1917,6 +1998,8 @@ function doParse(){
   if(f.commentary)document.getElementById(`f-co-${p}`).value=f.commentary;
   if(f.factors)document.getElementById(`f-fa-${p}`).value=f.factors;
   if(f.outlook)document.getElementById(`f-ou-${p}`).value=f.outlook;
+  if(f.additionalInfo)document.getElementById(`f-ad-${p}`).value=f.additionalInfo;
+  if(f.aiAnalysis)document.getElementById(`f-ai-${p}`).value=f.aiAnalysis;
 
   tabDone[p]=true;updDots();
   const ok=f.price&&f.pct!=null;
@@ -1999,8 +2082,11 @@ function renderCompactReportCard(prod,entry){
   const pct=entry.changePct==null?'—':(Number(entry.changePct)>=0?'+':'')+Number(entry.changePct).toFixed(2)+'%';
 
   // 출력용 카드에서는 원본 상세 내용을 생략하지 않음
+  entry=normalizeExtendedEntry(entry);
   const commentary=String(entry.commentary||'').trim() || '코멘터리 없음';
   const outlook=String(entry.outlook||'').trim() || '전망 내용 없음';
+  const additionalInfo=String(entry.additionalInfo||'').trim();
+  const aiAnalysis=String(entry.aiAnalysis||'').trim();
 
   let factors=String(entry.factors||'')
     .split(/\n+|\s+\/\s+/)
@@ -2038,6 +2124,16 @@ function renderCompactReportCard(prod,entry){
           <div class="report-compact-outlook">${reportText(outlook)}</div>
         </div>
       </div>
+      ${(additionalInfo||aiAnalysis)?`<div class="report-compact-detail-row">
+        <div class="report-compact-detail-box">
+          <div class="report-compact-section-label">Additional Information</div>
+          <div class="report-compact-outlook">${additionalInfo?reportText(additionalInfo):'추가 정보 없음'}</div>
+        </div>
+        <div class="report-compact-detail-box">
+          <div class="report-compact-section-label">AI Analysis & Forecast</div>
+          <div class="report-compact-outlook">${aiAnalysis?reportText(aiAnalysis):'AI 분석 없음'}</div>
+        </div>
+      </div>`:''}
     </div>
   </div>`;
 }
