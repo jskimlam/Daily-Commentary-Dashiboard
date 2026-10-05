@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
         ));
 
         ImageView splashIcon = new ImageView(this);
-        splashIcon.setImageResource(com.lam.daily.R.mipmap.ic_launcher);
+        splashIcon.setImageResource(com.lam.daily.R.mipmap.ic_launcher_art);
         splashIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         splashIcon.setBackgroundColor(Color.WHITE);
         int pad = dp(72);
@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
 
     private void configureWebView() {
         WebSettings s = webView.getSettings();
-        s.setJavaScriptEnabled(true);
+        s.setJavaScriptEnabled(true);\n        s.setTextZoom(100);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
         s.setLoadWithOverviewMode(true);
