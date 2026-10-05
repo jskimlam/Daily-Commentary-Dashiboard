@@ -103,7 +103,11 @@ table{max-width:100%;}
 .section-label-box{display:inline-block;background-color:var(--highlight-bg);border:2px solid #000;padding:4px 12px;margin:15px 18px 8px;border-radius:4px;}
 .section-label-text{font-family:var(--mono);font-size:13px;font-weight:900;color:#000;text-transform:uppercase;}
 .section-body-text{padding:0 18px 14px;font-size:15px;line-height:1.7;color:#000;word-break:keep-all;}
+.section-points{display:flex;flex-direction:column;gap:6px;}
+.section-point{position:relative;padding-left:14px;line-height:1.68;word-break:keep-all;overflow-wrap:anywhere;}
+.section-point::before{content:'•';position:absolute;left:1px;top:0;color:#9CA3AF;font-size:.78em;font-weight:900;line-height:2.05;}
 .text-bold{font-weight:800;}
+.text-bold .section-point{font-weight:800;}
 .no-data{padding:40px;text-align:center;color:#999;font-size:13px;}
 
 
@@ -937,6 +941,9 @@ table{max-width:100%;}
   .section-label-box{margin:10px 13px 6px!important;padding:3px 8px!important;}
   .section-label-text{font-size:10px!important;}
   .section-body-text{padding:0 13px 11px!important;font-size:12.5px!important;line-height:1.58!important;}
+  .section-points{gap:5px!important;}
+  .section-point{padding-left:12px!important;line-height:1.58!important;}
+  .section-point::before{left:1px!important;font-size:.74em!important;line-height:2!important;}
   #daily-view > div:first-child > div:last-child{
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
   }
@@ -1391,6 +1398,33 @@ async function loadData(){
   }catch(e){toast('❌ 데이터 로드 실패: '+e.message,'err');}
 }
 
+// ── 카드 본문 가독성: 원문은 유지하고 화면에서만 문장별 시각 구분 ──
+function splitDisplaySentences(txt){
+  let src=String(txt||'')
+    .replace(/<br\s*\/?>/gi,'\n')
+    .replace(/\r/g,'')
+    .trim();
+  if(!src)return[];
+
+  // 저장된 * / • / - 불릿은 화면 전용 포인트로 통일
+  src=src.replace(/^\s*[*•-]\s*/gm,'');
+
+  // 소수점(예: 966.50)은 유지하고 실제 문장 끝 부호 뒤 공백만 분리
+  src=src.replace(/([.!?。])\s+(?=[가-힣A-Za-z0-9$])/g,'$1\n');
+
+  return src.split(/\n+/)
+    .map(x=>x.trim())
+    .filter(Boolean);
+}
+
+function renderSectionText(txt){
+  const lines=splitDisplaySentences(txt);
+  if(!lines.length)return'';
+  return '<div class="section-points">'+lines.map(line=>
+    '<div class="section-point">'+escHtml(line)+'</div>'
+  ).join('')+'</div>';
+}
+
 // ── 카드 렌더 ──
 function renderCard(prod,entry,date){
   const cls=PCLS[prod];
@@ -1420,15 +1454,15 @@ function renderCard(prod,entry,date){
     </div>
     <div><span class="dir-badge ${dir}">${entry.direction}</span></div>
     ${entry.commentary?`<div class="section-label-box"><span class="section-label-text">Commentary</span></div>
-    <div class="section-body-text text-bold">${entry.commentary}</div>`:''}
+    <div class="section-body-text text-bold">${renderSectionText(entry.commentary)}</div>`:''}
     ${entry.factors?`<div class="section-label-box"><span class="section-label-text">Market Factors</span></div>
-    <div class="section-body-text">${entry.factors.replace(/\n/g,'<br>')}</div>`:''}
+    <div class="section-body-text">${renderSectionText(entry.factors)}</div>`:''}
     ${entry.outlook?`<div class="section-label-box"><span class="section-label-text">Outlook</span></div>
-    <div class="section-body-text">${entry.outlook.replace(/\n/g,'<br>')}</div>`:''}
+    <div class="section-body-text">${renderSectionText(entry.outlook)}</div>`:''}
     ${entry.additionalInfo?`<div class="section-label-box"><span class="section-label-text">Additional Information · 추가 정보</span></div>
-    <div class="section-body-text">${entry.additionalInfo.replace(/\n/g,'<br>')}</div>`:''}
+    <div class="section-body-text">${renderSectionText(entry.additionalInfo)}</div>`:''}
     ${entry.aiAnalysis?`<div class="section-label-box"><span class="section-label-text">AI Analysis & Forecast · AI 분석 의견 및 예측 전망</span></div>
-    <div class="section-body-text text-bold">${entry.aiAnalysis.replace(/\n/g,'<br>')}</div>`:''}
+    <div class="section-body-text text-bold">${renderSectionText(entry.aiAnalysis)}</div>`:''}
   </div>`;
 }
 
