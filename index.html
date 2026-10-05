@@ -385,16 +385,7 @@ table{max-width:100%;}
 .trend-capture-btn{border:1px solid #111827;background:#fff;color:#111827;padding:7px 11px;border-radius:7px;font-size:11px;font-weight:900;cursor:pointer;}
 .trend-capture-btn.primary{background:#111827;color:#fff;}
 .trend-chart-wrap{position:relative;width:100%;height:360px;padding:10px 12px 8px;}
-body.trend-capture-mode{background:#fff;}
-body.trend-capture-mode .hdr,body.trend-capture-mode .sidebar,body.trend-capture-mode .view-tabs{display:none!important;}
-body.trend-capture-mode .layout{display:block;max-width:1440px;padding:20px 24px 42px;margin:0 auto;}
-body.trend-capture-mode .main{width:100%;max-width:none;}
-body.trend-capture-mode #daily-view{display:none!important;}
-body.trend-capture-mode #trend-view{display:flex!important;}
-body.trend-capture-mode .trend-range,body.trend-capture-mode .trend-card-tools,body.trend-capture-mode .trend-capture-actions{display:none!important;}
-body.trend-capture-mode .trend-toolbar{box-shadow:none;border-color:#D1D5DB;}
-body.trend-capture-mode .trend-card{box-shadow:none;border-color:#D1D5DB;}
-body.trend-capture-mode .trend-chart-wrap{height:330px;}
+
 .trend-empty{padding:60px 20px;text-align:center;color:var(--g4);font-size:13px;}
 .trend-note{font-size:10px;color:var(--g3);line-height:1.5;padding:0 17px 12px;}
 .trend-name-wti{color:var(--wti)}.trend-name-bz{color:var(--bz)}.trend-name-sm{color:var(--sm)}.trend-name-bd{color:var(--bd2)}
@@ -410,7 +401,7 @@ body.trend-capture-mode .trend-chart-wrap{height:330px;}
   .trend-card-tools{padding:8px 12px 0;align-items:flex-start;}
   .trend-token-row{gap:5px;}
   .trend-token{font-size:9px;padding:5px 8px;}
-  .trend-capture-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;}
+  .trend-capture-actions{width:100%;display:block;}
   .trend-capture-btn{width:100%;font-size:10px;padding:7px 5px;}
   .trend-chart-wrap{height:300px;padding:8px 4px 6px;}
   .trend-note{font-size:9px;padding:0 12px 10px;}
@@ -981,8 +972,7 @@ body.trend-capture-mode .trend-chart-wrap{height:330px;}
             <button class="trend-range-btn" data-range="0" onclick="setTrendRange(0)">전체</button>
           </div>
           <div class="trend-capture-actions">
-            <button class="trend-capture-btn" id="trend-capture-mode-btn" onclick="toggleTrendCaptureMode()">📷 캡쳐모드</button>
-            <button class="trend-capture-btn primary" onclick="dlTrendImage()">🖼 전체 품목 저장</button>
+            <button class="trend-capture-btn primary" onclick="dlTrendA4Png()">🖼 A4 PNG 저장</button>
           </div>
         </div>
       </div>
@@ -1949,15 +1939,6 @@ function toggleTrendSeries(prod,key){
   renderTrendCharts();
 }
 
-function toggleTrendCaptureMode(force){
-  const next=typeof force==='boolean'?force:!document.body.classList.contains('trend-capture-mode');
-  document.body.classList.toggle('trend-capture-mode',next);
-  const btn=document.getElementById('trend-capture-mode-btn');
-  if(btn)btn.textContent=next?'✕ 캡쳐모드 종료':'📷 캡쳐모드';
-  if(next&&mainView!=='trend')switchMainView('trend');
-  setTimeout(()=>Object.values(trendCharts).forEach(ch=>{try{ch.resize();}catch(e){}}),60);
-}
-
 function trendTokenHtml(prod,key,label){
   const on=trendSeriesState(prod)[key];
   return `<button class="trend-token${on?' active':''}" data-series="${key}" onclick="toggleTrendSeries('${prod}','${key}')">${label}</button>`;
@@ -2039,120 +2020,193 @@ function renderTrendCharts(){
   });
 }
 
-function buildTrendCapture(){
-  if(mainView!=='trend')switchMainView('trend');
-  const cap=document.createElement('div');
-  cap.style.position='fixed';
-  cap.style.left='-20000px';
-  cap.style.top='0';
-  cap.style.width='1400px';
-  cap.style.maxWidth='none';
-  cap.style.background='#FFFFFF';
-  cap.style.padding='28px 30px 34px';
-  cap.style.boxSizing='border-box';
-  cap.style.fontFamily='var(--sans)';
-  cap.style.color='#111827';
-
-  const lastDates=TREND_ORDER.map(p=>{
-    const rows=trendSeries(p,false);
-    return rows.length?rows[rows.length-1].date:'';
+function latestTrendDate(){
+  const ds=TREND_ORDER.flatMap(prod=>{
+    const rows=trendSeries(prod,false);
+    return rows.length?[rows[rows.length-1].date]:[];
   }).filter(Boolean).sort();
-  const asOf=lastDates.length?lastDates[lastDates.length-1]:'—';
+  return ds.length?ds[ds.length-1]:'latest';
+}
+
+function activeTrendLabels(prod){
+  const s=trendSeriesState(prod);
+  const labels=[];
+  if(s.price)labels.push('PRICE');
+  if(s.ma5)labels.push('MA5');
+  if(s.ma20)labels.push('MA20');
+  if(s.ma60)labels.push('MA60');
+  if(s.bb)labels.push('BOLLINGER');
+  return labels.join(' · ')||'PRICE SERIES HIDDEN';
+}
+
+function buildTrendA4Export(){
+  const W=1240,H=1754;
+  const page=document.createElement('div');
+  page.id='trend-a4-export';
+  page.style.position='fixed';
+  page.style.left='-20000px';
+  page.style.top='0';
+  page.style.width=W+'px';
+  page.style.height=H+'px';
+  page.style.overflow='hidden';
+  page.style.background='#FFFFFF';
+  page.style.padding='34px 38px 26px';
+  page.style.boxSizing='border-box';
+  page.style.fontFamily='var(--sans)';
+  page.style.color='#111827';
+  page.style.display='flex';
+  page.style.flexDirection='column';
+
+  const asOf=latestTrendDate();
+  const periodLabel=trendRange===65?'3 MONTHS':trendRange===130?'6 MONTHS':'ALL HISTORY';
 
   const head=document.createElement('div');
+  head.style.flex='0 0 auto';
   head.innerHTML=`
-    <div style="font-family:var(--disp);font-size:30px;font-weight:900;letter-spacing:.01em;">DAILY PRICE TREND</div>
-    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px;padding-bottom:14px;border-bottom:3px solid #111827;">
-      <div style="font-size:13px;font-weight:800;color:#4B5563;">WTI · BZ · SM · BD | Price / MA5 / MA20 / MA60 / Bollinger Band</div>
-      <div style="font-family:var(--mono);font-size:12px;font-weight:800;color:#111827;">AS OF ${asOf}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;">
+      <div>
+        <div style="font-family:var(--disp);font-size:31px;font-weight:900;letter-spacing:.01em;">DAILY PRICE TREND</div>
+        <div style="font-size:12px;font-weight:800;color:#4B5563;margin-top:5px;">WTI · BZ · SM · BD | Historical Daily Assessment Trend</div>
+      </div>
+      <div style="text-align:right;font-family:var(--mono);">
+        <div style="font-size:12px;font-weight:900;">AS OF ${asOf}</div>
+        <div style="font-size:10px;color:#6B7280;margin-top:3px;">${periodLabel}</div>
+      </div>
+    </div>
+    <div style="height:3px;background:#111827;margin-top:12px;"></div>
+    <div style="display:flex;gap:16px;align-items:center;margin-top:8px;font-family:var(--mono);font-size:9px;font-weight:800;flex-wrap:wrap;">
+      <span style="color:#111111;">━ PRICE</span>
+      <span style="color:#2563EB;">━ MA5</span>
+      <span style="color:#DC2626;">━ MA20</span>
+      <span style="color:#15803D;">━ MA60</span>
+      <span style="color:#6B7280;">┄ BOLLINGER 20D ±2σ</span>
     </div>`;
-  cap.appendChild(head);
+  page.appendChild(head);
+
+  const body=document.createElement('div');
+  body.style.display='grid';
+  body.style.gridTemplateRows='repeat(4, 1fr)';
+  body.style.gap='12px';
+  body.style.flex='1 1 auto';
+  body.style.minHeight='0';
+  body.style.marginTop='12px';
 
   TREND_ORDER.forEach(prod=>{
     const chart=trendCharts[prod];
-    const rows=calcTrendIndicators(trendSeries(prod,false));
-    const shown=trendRange>0?rows.slice(-trendRange):rows;
+    const full=calcTrendIndicators(trendSeries(prod,false));
+    const shown=trendRange>0?full.slice(-trendRange):full;
     if(!chart||!shown.length)return;
+
     const last=shown[shown.length-1];
     const unit=prod==='WTI'?'$/b':'$/mt';
+    const fmt=v=>v==null?'—':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
     const card=document.createElement('div');
-    card.style.marginTop='16px';
     card.style.border='1px solid #D1D5DB';
-    card.style.borderRadius='12px';
+    card.style.borderRadius='10px';
     card.style.overflow='hidden';
     card.style.background='#fff';
+    card.style.display='flex';
+    card.style.flexDirection='column';
+    card.style.minHeight='0';
 
     const top=document.createElement('div');
+    top.style.flex='0 0 auto';
     top.style.display='flex';
     top.style.justifyContent='space-between';
     top.style.alignItems='center';
-    top.style.padding='12px 16px';
+    top.style.gap='12px';
+    top.style.padding='9px 13px 7px';
     top.style.borderBottom='1px solid #E5E7EB';
-    const fmt=v=>v==null?'—':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     top.innerHTML=`
-      <div>
-        <div style="font-family:var(--disp);font-size:20px;font-weight:900;">${TREND_SHORT[prod]} · ${TREND_MARKET[prod]}</div>
-        <div style="font-family:var(--mono);font-size:10px;color:#6B7280;margin-top:3px;">${shown[0].date} → ${shown[shown.length-1].date} · ${shown.length} observations</div>
+      <div style="min-width:0;">
+        <div style="font-family:var(--disp);font-size:18px;font-weight:900;">${TREND_SHORT[prod]} · ${TREND_MARKET[prod]}</div>
+        <div style="font-family:var(--mono);font-size:8.5px;color:#6B7280;margin-top:2px;">${shown[0].date} → ${shown[shown.length-1].date} · ${shown.length} observations · ${activeTrendLabels(prod)}</div>
       </div>
-      <div style="text-align:right;font-family:var(--mono);font-size:11px;font-weight:800;line-height:1.55;">
-        <span style="color:#111111">PRICE ${fmt(last.price)}</span> &nbsp;
-        <span style="color:#2563EB">MA5 ${fmt(last.ma5)}</span> &nbsp;
-        <span style="color:#DC2626">MA20 ${fmt(last.ma20)}</span> &nbsp;
-        <span style="color:#15803D">MA60 ${fmt(last.ma60)}</span>
-        <div style="color:#6B7280;font-size:9px;">${unit}</div>
+      <div style="text-align:right;font-family:var(--mono);font-size:9px;font-weight:800;line-height:1.45;white-space:nowrap;">
+        <span style="color:#111111;">PRICE ${fmt(last.price)}</span>
+        <span style="color:#2563EB;margin-left:8px;">MA5 ${fmt(last.ma5)}</span>
+        <span style="color:#DC2626;margin-left:8px;">MA20 ${fmt(last.ma20)}</span>
+        <span style="color:#15803D;margin-left:8px;">MA60 ${fmt(last.ma60)}</span>
+        <div style="font-size:8px;color:#6B7280;">${unit}</div>
       </div>`;
     card.appendChild(top);
+
+    const imgWrap=document.createElement('div');
+    imgWrap.style.flex='1 1 auto';
+    imgWrap.style.minHeight='0';
+    imgWrap.style.padding='3px 7px 6px';
+    imgWrap.style.display='flex';
+    imgWrap.style.alignItems='stretch';
 
     const img=document.createElement('img');
     img.src=chart.toBase64Image('image/png',1);
     img.style.display='block';
     img.style.width='100%';
-    img.style.height='310px';
+    img.style.height='100%';
     img.style.objectFit='contain';
     img.style.background='#fff';
-    img.style.padding='4px 8px 8px';
-    card.appendChild(img);
-    cap.appendChild(card);
+    imgWrap.appendChild(img);
+    card.appendChild(imgWrap);
+    body.appendChild(card);
   });
 
-  const foot=document.createElement('div');
-  foot.style.marginTop='14px';
-  foot.style.fontSize='10px';
-  foot.style.color='#6B7280';
-  foot.style.textAlign='right';
-  foot.textContent='Daily Chemical Brief · Historical trend view · Moving averages based on observed assessment days';
-  cap.appendChild(foot);
+  page.appendChild(body);
 
-  document.body.appendChild(cap);
-  return cap;
+  const foot=document.createElement('div');
+  foot.style.flex='0 0 auto';
+  foot.style.marginTop='8px';
+  foot.style.display='flex';
+  foot.style.justifyContent='space-between';
+  foot.style.fontSize='8.5px';
+  foot.style.color='#6B7280';
+  foot.innerHTML='<span>Moving averages: simple moving average on observed assessment days</span><span>Daily Chemical Brief · created by JSKIM of LAM</span>';
+  page.appendChild(foot);
+
+  document.body.appendChild(page);
+  return page;
 }
 
-function dlTrendImage(){
-  if(typeof html2canvas==='undefined'){toast('❌ 캡쳐 모듈을 불러오지 못했습니다','err');return;}
-  if(mainView!=='trend')switchMainView('trend');
+function dlTrendA4Png(){
+  if(typeof html2canvas==='undefined'){
+    toast('❌ PNG 생성 모듈을 불러오지 못했습니다','err');
+    return;
+  }
+  if(mainView!=='trend'){
+    switchMainView('trend');
+  }
+
   setTimeout(()=>{
-    const cap=buildTrendCapture();
-    if(!cap){toast('❌ 가격추세 캡쳐 영역 생성 실패','err');return;}
-    html2canvas(cap,{
+    const page=buildTrendA4Export();
+    if(!page){
+      toast('❌ A4 PNG 생성 영역을 만들지 못했습니다','err');
+      return;
+    }
+
+    html2canvas(page,{
       backgroundColor:'#FFFFFF',
-      scale:1.6,
-      width:1400,
-      windowWidth:1500,
-      useCORS:true
+      scale:2,
+      width:1240,
+      height:1754,
+      windowWidth:1240,
+      windowHeight:1754,
+      useCORS:true,
+      logging:false
     }).then(canvas=>{
-      cap.remove();
+      page.remove();
       const a=document.createElement('a');
       a.href=canvas.toDataURL('image/png');
-      const suffix=trendRange===65?'3M':trendRange===130?'6M':'ALL';
-      a.download='DailyPriceTrend_'+suffix+'_'+(curDate||'latest')+'.png';
+      a.download='DailyPriceTrend_A4_'+latestTrendDate()+'.png';
+      document.body.appendChild(a);
       a.click();
-      toast('✅ WTI · BZ · SM · BD 전체 가격추세 이미지 저장 완료','ok');
+      a.remove();
+      toast('✅ A4 세로 PNG 저장 완료','ok');
     }).catch(err=>{
-      console.error('Trend capture error:',err);
-      cap.remove();
-      toast('❌ 가격추세 이미지 저장 실패','err');
+      console.error('A4 trend PNG error:',err);
+      page.remove();
+      toast('❌ A4 PNG 저장 실패','err');
     });
-  },80);
+  },120);
 }
 
 // ── API (GET 방식) ──
