@@ -25,7 +25,7 @@ val decodeLamIcon by tasks.registering {
         ).forEach { density ->
             val dir = File(root, density)
             dir.mkdirs()
-            File(dir, "ic_launcher.jpg").writeBytes(bytes)
+            File(dir, "ic_launcher.jpg").writeBytes(bytes)\n            File(dir, "ic_launcher_art.jpg").writeBytes(bytes)
         }
     }
 }
@@ -38,8 +38,8 @@ android {
         applicationId = "com.lam.daily"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     sourceSets.getByName("main").res.srcDir(generatedIconResDir)
