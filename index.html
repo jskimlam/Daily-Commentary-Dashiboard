@@ -2475,11 +2475,26 @@ function toB64(obj){
 }
 async function gasGet(params){
   const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  const res=await fetch(GAS+'?'+qs);
-  return res.json();
+  const url=GAS+'?'+qs;
+  // Google Apps Script GET endpoints can reject very long briefing payloads.
+  if(url.length>16000)throw new Error('요청 주소 '+url.length+'자: 긴 브리핑으로 GET 전송 한도 초과 가능. 서버 POST 지원 필요');
+  let res;
+  try{res=await fetch(url,{redirect:'follow'});}
+  catch(e){throw new Error('Apps Script 연결 실패: '+(e.message||String(e)));}
+  const body=await res.text();
+  if(!res.ok)throw new Error('서버 HTTP '+res.status+': '+body.slice(0,160));
+  try{return JSON.parse(body);}
+  catch(e){throw new Error('서버가 JSON 대신 '+(body.trim().startsWith('<')?'HTML 로그인/오류 화면':'예상 외 응답')+'을 반환: '+body.slice(0,120));}
 }
 async function doSaveAll(){
-  let count=0;
+  let count=0,failed=[];
+  const pending=[];
+  for(const p of PRODS){
+    const date=document.getElementById('f-date-'+p).value;
+    const price=document.getElementById('f-price-'+p).value;
+    if(date&&price)pending.push(p);
+  }
+  if(!pending.length){toast('저장할 가격 및 날짜가 없습니다','err');return;}
   for(const p of PRODS){
     const price=parseFloat(document.getElementById('f-price-'+p).value);
     const date=document.getElementById('f-date-'+p).value;
@@ -2502,13 +2517,24 @@ async function doSaveAll(){
     };
     const action=isEdit?'edit':'save';
     const payload={sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
+    // Preserve a local recoverable copy even when the remote write fails.
+    try{localStorage.setItem('LAM_daily_unsaved_'+p,JSON.stringify({savedAt:new Date().toISOString(),action,payload}));}
+    catch(e){console.warn('Local backup unavailable',e);}
     try{
       const r=await gasGet({action,p:toB64(payload)});
-      if(r.success)count++;
-      else toast('❌ '+p+': '+r.message,'err');
-    }catch(e){toast('❌ '+p+' 저장 실패','err');}
+      if(r.success){count++;try{localStorage.removeItem('LAM_daily_unsaved_'+p);}catch(e){}}
+      else failed.push(p+': '+(r.message||r.error||'서버에서 저장 거절'));
+    }catch(e){failed.push(p+': '+(e.message||String(e)));}
   }
-  if(count>0){toast('✅ '+count+'개 품목 저장 완료','ok');closeModal();loadData();}
+  if(failed.length){
+    console.error('LAM Daily save failures',failed);
+    alert('저장 실패 ('+failed.length+'건)\\n'+failed.join('\\n').slice(0,950)+'\\n\\n입력값은 이 브라우저의 로컬 백업에 보존됨. 창을 닫지 말고 오류를 확인해 주세요.');
+    showSt(activeTab,'warn','저장 실패: '+failed[0].slice(0,120));
+  }
+  if(count>0){
+    toast('✅ '+count+'개 품목 저장 완료','ok');
+    if(!failed.length){closeModal();loadData();}
+  }
 }
 async function delEntry(prod,date){
   if(!checkAdmin())return;
