@@ -2567,8 +2567,11 @@ function parseWTI(txt){
 function parseBriefing(txt, prod){
   const f={};
 
-  // ** 마크다운 볼드 제거 (있든 없든 동일하게 파싱)
-  txt=txt.replace(/\*\*/g,'');
+  // Normalize copied rich text, including collapsed section headings and escaped bullets.
+  txt=txt.replace(/\*\*/g,'').replace(/\\([*$])/g,'$1').replace(/\r/g,'').replace(/\u00a0/g,' ');
+  txt=txt.replace(/\s*([1-6]\.\s*(?:가격|코멘터리|변동요인|결론 및 전망|추가 정보|AI 분석 의견 및 예측 전망))\s*/g,'\n$1\n');
+  // Some mobile clipboard renderers join the first bullet to its heading.
+  txt=txt.replace(/(\n[1-6]\.\s*[^\n]+)\s+([*•-]\s+)/g,'$1\n$2');
 
   // 날짜: 본문 어디에 있든 YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD 허용
   const dm=txt.match(/(\d{4})[.\/-](\d{1,2})[.\/-](\d{1,2})/);
