@@ -2607,7 +2607,14 @@ function parseBriefing(txt, prod){
     Butadiene:['CFR China','CFR NEA','Butadiene','BD']
   };
   const keys=productKeywords[prod]||[prod];
+  // Anchor the price to its own commodity line, not to the first arbitrary price line.
   const priceLine=sec1.find(l=>keys.some(k=>l.includes(k))) || sec1[0] || '';
+  // WTI import fallback: some copies flatten all lines or paste only the price sentence.
+  // Never read Brent as the WTI price.
+  if(prod==='WTI' && !priceLine){
+    const wm=txt.match(/(?:WTI|서부텍사스산원유)[^\n]{0,170}?\$\s*([\d,]+(?:\.\d+)?)\s*\/(?:b|bbl)\b/i);
+    if(wm)f.price=parseFloat(wm[1].replace(/,/g,''));
+  }
 
   if(priceLine){
     // 가격: $972.00/mt, $1,270/mt, $65.42/bbl, $65.42/b 모두 허용
@@ -2681,6 +2688,17 @@ function doParse(){
 
   // 제품별 파싱 분기
   const f=parseBriefing(txt,p);
+  // The old WTI news parser is intentionally not used for structured 1–6 briefs.
+  // If the pasted text contains escaped Markdown bullets, normalize and retry.
+  if(p==='WTI' && (f.price==null || f.change==null)){
+    const normalized=txt.replace(/\\([*$])/g,'$1').replace(/\u00a0/g,' ').replace(/\r/g,'');
+    if(normalized!==txt){
+      const fallback=parseBriefing(normalized,p);
+      for(const k of ['price','change','pct','dir','dateStr','commentary','factors','outlook','additionalInfo','aiAnalysis']){
+        if(f[k]==null && fallback[k]!=null)f[k]=fallback[k];
+      }
+    }
+  }
 
   // 공통 필드 적용
   if(f.dateStr)document.getElementById(`f-date-${p}`).value=f.dateStr;
