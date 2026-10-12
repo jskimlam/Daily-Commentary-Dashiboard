@@ -2548,8 +2548,8 @@ async function gasPost(params){
   throw new Error('POST 전송 이후 저장 확인 실패: 중복 저장 전 시트 데이터를 확인하세요');
 }
 async function gasWrite(params){
-  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  return (GAS+'?'+qs).length>16000 ? gasPost(params) : gasGet(params);
+  // All writes now use POST. Short GET save redirects sometimes fail in browsers.
+  return gasPost(params);
 }
 async function doSaveAll(){
   let count=0,failed=[];
