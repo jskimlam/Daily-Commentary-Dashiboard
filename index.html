@@ -2612,6 +2612,22 @@ async function requireDailyBackendV2(){
     throw new Error('Apps Script 새 Code.gs 버전이 아닙니다. 기존 웹앱을 새 버전으로 다시 배포해 주세요');
   dailyBackendV2Ready=true;
 }
+async function verifyDailyWritten(payload,prefix){
+  try{
+    const check=await gasJsonp({action:'verify',sheet:payload.sheet,date:payload.data.date},25000);
+    const row=check?.entry;
+    const data=payload.data||{};
+    const match=check?.success && check?.found && row &&
+      Number(row.price)===Number(data.price) &&
+      String(row.commentary||'')===String(data.commentary||'') &&
+      String(row.factors||'')===String(data.factors||'') &&
+      String(row.outlook||'')===String(data.outlook||'');
+    if(match)return {success:true,verified:true,message:'Google Sheets 원문 일치 확인'};
+    return {success:false,unverified:true,message:prefix+' · 시트 저장 여부를 다시 확인해 주세요'};
+  }catch(e){
+    return {success:false,unverified:true,message:prefix+' · 서버 확인 연결 실패. 같은 날짜를 중복 저장하기 전에 시트를 확인해 주세요'};
+  }
+}
 async function gasWrite(params){
   // A transient failure on a separate health request must not block a real save.
   // The save action itself returns an explicit unsupported-version error if needed.
@@ -2624,17 +2640,18 @@ async function gasWrite(params){
   const full=GAS+'?'+new URLSearchParams({...qs,callback:'__daily_cb_'+Date.now()+'_1234567890'}).toString();
   if(full.length>15000)return gasPost(params);
   showDailySaveState('압축 전송 중 · 원본 '+params.p.length+'자 → 압축 '+compressed.length+'자…');
-  const reply=await gasJsonp(qs);
+  let reply;
+  try{
+    reply=await gasJsonp(qs,25000);
+  }catch(e){
+    // ContentService sometimes executes the write but loses its response.
+    // First check the date before allowing another write attempt.
+    showDailySaveState('저장 응답 지연 · 원본 데이터 확인 중…','warn');
+    return verifyDailyWritten(payload,'저장 응답이 전달되지 않음');
+  }
   if(!reply?.success)return {success:false,message:reply?.message||'Apps Script 저장 거절'};
-  showDailySaveState('서버 저장 성공 · 저장 내용 확인 중…');
-  const check=await gasJsonp({action:'verify',sheet:payload.sheet,date:payload.data.date});
-  if(!check?.success||!check?.found)return {success:false,unverified:true,message:'저장 응답 수신, 검증 재조회 실패'};
-  const match=check.entry && Number(check.entry.price)===Number(payload.data.price) &&
-    String(check.entry.commentary||'')===String(payload.data.commentary||'') &&
-    String(check.entry.factors||'')===String(payload.data.factors||'') &&
-    String(check.entry.outlook||'')===String(payload.data.outlook||'');
-  if(!match)return {success:false,unverified:true,message:'저장 응답 수신, 원문 일치 확인 필요'};
-  return {success:true,verified:true};
+  showDailySaveState('서버 저장 응답 수신 · 원문 일치 확인 중…');
+  return verifyDailyWritten(payload,'저장 확인 응답이 지연됨');
 }
 let dailySaving=false;
 function showDailySaveState(message,kind){
