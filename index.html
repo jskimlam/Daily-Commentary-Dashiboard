@@ -2497,38 +2497,56 @@ async function gasGet(params){
 // through the existing cross-origin GET /load endpoint before success.
 // Single transport for saving all briefing lengths: ordinary uncompressed POST.
 // The server already supports doPost action=save/edit with base64 JSON field p.
+// Keep the pre-October-12 write path: simple GET for ordinary briefs.
+// Large briefs use an uncompressed x-www-form-urlencoded POST; no gzip or JSONP.
 async function saveBriefingToSheet(action,payload){
-  showDailySaveState('Google Sheets로 전송 중…');
+  const params={action,p:toB64(payload)};
+  const query=new URLSearchParams(params).toString();
+  const urlLength=(GAS+'?'+query).length;
+  if(urlLength<=12000){
+    showDailySaveState('기존 GET 방식으로 저장 중…');
+    try{
+      const result=await gasGet(params);
+      if(result?.success)return result;
+      return {success:false,message:result?.message||'Google Sheets 저장 요청 거절'};
+    }catch(err){
+      showDailySaveState('저장 응답 확인 중…','warn');
+      return await verifySimpleSheetSave(payload,'GET 응답 오류: '+(err.message||String(err)));
+    }
+  }
+  showDailySaveState('긴 브리핑을 압축 없이 POST로 저장 중…');
   try{
     await fetch(GAS,{
-      method:'POST',mode:'no-cors',redirect:'follow',
-      body:new URLSearchParams({action,p:toB64(payload)})
+      method:'POST',
+      mode:'no-cors',
+      redirect:'follow',
+      body:new URLSearchParams(params)
     });
   }catch(err){
-    throw new Error('서버 전송 실패: '+(err.message||String(err)));
+    return {success:false,message:'POST 연결 실패: '+(err.message||String(err))};
   }
-  // The POST response is opaque, so check the actual Sheet row using read-only GET.
-  let reason='';
+  return verifySimpleSheetSave(payload,'POST 전송 후 결과 확인 필요');
+}
+async function verifySimpleSheetSave(payload,prefix){
+  let lastError='';
   for(let n=1;n<=6;n++){
-    showDailySaveState('Google Sheets 저장 여부 확인 중 ('+n+'/6)…');
-    await new Promise(resolve=>setTimeout(resolve,n===1?1000:1500));
+    showDailySaveState('Google Sheets 저장 확인 중 ('+n+'/6)…');
+    await new Promise(resolve=>setTimeout(resolve,n===1?1000:1200));
     try{
-      const result=await gasGet({action:'verify',sheet:payload.sheet,date:payload.data.date,_:Date.now()});
-      if(result && result.success===false)throw new Error(result.message||'조회 실패');
-      if(result && result.found && result.entry){
-        const saved=result.entry,src=payload.data;
-        if(String(saved.date||'')===String(src.date||'') &&
-           Number(saved.price)===Number(src.price) &&
-           String(saved.commentary||'')===String(src.commentary||'') &&
-           String(saved.factors||'')===String(src.factors||'') &&
-           String(saved.outlook||'')===String(src.outlook||'')){
-          return {success:true};
-        }
-        reason='동일 날짜의 저장 내용을 아직 확인하지 못함';
-      }else reason='시트에서 해당 날짜를 찾지 못함';
-    }catch(err){reason=err.message||String(err);}
+      const result=await gasGet({action:'verify',sheet:payload.sheet,date:payload.data.date,t:Date.now()});
+      const row=result?.entry||{};
+      const src=payload.data;
+      const same=result?.success&&result?.found&&
+        String(row.date||'')===String(src.date||'')&&
+        Number(row.price)===Number(src.price)&&
+        String(row.commentary||'')===String(src.commentary||'')&&
+        String(row.factors||'')===String(src.factors||'')&&
+        String(row.outlook||'')===String(src.outlook||'');
+      if(same)return {success:true,message:'시트에서 실제 저장 확인'};
+      lastError=result?.message||'저장한 내용과 시트 값이 아직 일치하지 않음';
+    }catch(err){lastError=err.message||String(err);}
   }
-  return {success:false,unverified:true,message:'전송은 완료됐으나 저장 확인이 되지 않음 ('+reason+'). 새로고침 후 날짜를 확인해 주세요'};
+  return {success:false,unverified:true,message:prefix+' · '+lastError+' (중복 저장 전 날짜 확인 필요)'};
 }
 let dailySaving=false;
 function showDailySaveState(message,kind){
