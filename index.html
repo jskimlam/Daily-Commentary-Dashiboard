@@ -1207,7 +1207,7 @@ table{max-width:100%;}
     </div>
     <div style="display:flex;border-bottom:1px solid #eee;overflow-x:auto;" id="tab-bar"></div>
     <div id="tab-panels" style="flex:1;overflow-y:auto;padding:22px;"></div>
-    <div style="padding:15px 22px;background:#f9fafb;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px;">
+    <div style="padding:15px 22px;background:#f9fafb;border-top:1px solid #eee;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;">
       <button class="btn btn-outline" onclick="restoreUnsavedEntry()" title="저장 오류 시 로컬 백업에서 입력값 복원">↺ 로컬 백업 복구</button>
       <button class="btn btn-outline" onclick="doParse()">🔍 파싱 실행</button>
       <button class="btn btn-primary" onclick="doSaveAll()">▶ 전체 저장</button>
