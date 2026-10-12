@@ -2543,7 +2543,7 @@ async function gasPost(params){
     showDailySaveState('시트 저장 여부 확인 중 ('+(attempt+1)+'/7)…');
     if(attempt)await new Promise(resolve=>setTimeout(resolve,600+300*attempt));
     try{
-      const readback=await gasGet({action:'load'});
+      const readback=await gasGet({action:'load',v:Date.now()});
       const rows=readback?.data?.[sheet]||[];
       if(rows.some(r=>r.date===data.date &&
         Number(r.price)===Number(data.price) &&
