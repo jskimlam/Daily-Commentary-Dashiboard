@@ -2115,7 +2115,10 @@ function restoreUnsavedEntry(){
   showSt(p,'ok','로컬 백업 복구 완료 — 내용 확인 후 다시 저장하세요');
   toast('✅ '+p+' 로컬 백업 복구 완료','ok');
 }
-function closeModal(){document.getElementById('overlay').classList.remove('open');}
+function closeModal(){
+  if(dailySaving){toast('저장 확인 중입니다. 완료될 때까지 기다려 주세요','err');return;}
+  document.getElementById('overlay').classList.remove('open');
+}
 function switchTab(p){
   activeTab=p;
   document.querySelectorAll('.m-tab').forEach(t=>t.classList.toggle('active',t.textContent===p));
