@@ -2582,7 +2582,19 @@ async function compressDailyPayload(base64){
   for(let i=0;i<zipped.length;i+=8192)raw+=String.fromCharCode(...zipped.subarray(i,i+8192));
   return btoa(raw);
 }
+let dailyBackendV2Ready=false;
+async function requireDailyBackendV2(){
+  if(dailyBackendV2Ready)return;
+  showDailySaveState('Apps Script 서버 버전 확인 중…');
+  let info;
+  try{info=await gasJsonp({action:'health'},12000);}
+  catch(e){throw new Error('Apps Script 새 Code.gs 배포가 필요합니다. 서버 버전 확인 실패: '+e.message);}
+  if(!info?.success || info?.version!=='20261012-compressed-v2')
+    throw new Error('Apps Script 새 Code.gs 버전이 아닙니다. 기존 웹앱을 새 버전으로 다시 배포해 주세요');
+  dailyBackendV2Ready=true;
+}
 async function gasWrite(params){
+  await requireDailyBackendV2();
   if(typeof CompressionStream!=='function')return gasPost(params);
   const payload=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(params.p),c=>c.charCodeAt(0))));
   showDailySaveState('브리핑 압축 후 서버 전송 준비 중…');
