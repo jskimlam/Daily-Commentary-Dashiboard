@@ -1208,7 +1208,6 @@ table{max-width:100%;}
     <div style="display:flex;border-bottom:1px solid #eee;overflow-x:auto;" id="tab-bar"></div>
     <div id="tab-panels" style="flex:1;overflow-y:auto;padding:22px;"></div>
     <div style="padding:15px 22px;background:#f9fafb;border-top:1px solid #eee;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;">
-      <button class="btn btn-outline" onclick="restoreUnsavedEntry()" title="저장 오류 시 로컬 백업에서 입력값 복원">↺ 로컬 백업 복구</button>
       <button class="btn btn-outline" onclick="doParse()">🔍 파싱 실행</button>
       <span id="daily-save-state" role="status" aria-live="polite" style="display:none;flex:1;min-width:180px;font-size:13px;font-weight:700;color:#1d4ed8;"></span>
       <button class="btn btn-primary" id="daily-save-button" onclick="doSaveAll()">▶ 전체 저장</button>
@@ -2089,32 +2088,6 @@ function openEditModal(prod,date){
 }
 
 // Restore the complete draft saved before any remote write attempt.
-function restoreUnsavedEntry(){
-  const p=activeTab;
-  let saved;
-  try{
-    const raw=localStorage.getItem('LAM_daily_unsaved_'+p);
-    if(!raw){toast('복구할 '+p+' 로컬 백업이 없습니다','err');return;}
-    saved=JSON.parse(raw);
-  }catch(e){toast('로컬 백업을 읽을 수 없습니다: '+e.message,'err');return;}
-  const data=saved?.payload?.data;
-  if(!data){toast('로컬 백업 형식이 올바르지 않습니다','err');return;}
-  const d=decodeExtendedOutlook(data.outlook||'');
-  const set=(key,value)=>{const el=document.getElementById(key+'-'+p);if(el)el.value=value??'';};
-  set('f-date',String(data.date||'').replace(/\./g,'-'));
-  set('f-price',data.price);set('f-change',data.change);
-  set('f-pct',data.changePct);set('f-dir',data.direction||'보합');
-  set('f-co',data.commentary);set('f-fa',data.factors);
-  set('f-ou',d.outlook);
-  set('f-ad',data.additionalInfo||d.additionalInfo);
-  set('f-ai',data.aiAnalysis||d.aiAnalysis);
-  editMode=saved.action==='edit'
-    ?{sheet:p,date:saved.payload?.rowKey?.date||data.date}
-    :{};
-  document.getElementById('modal-title').textContent='RECOVERED · '+p+' · '+(data.date||'');
-  showSt(p,'ok','로컬 백업 복구 완료 — 내용 확인 후 다시 저장하세요');
-  toast('✅ '+p+' 로컬 백업 복구 완료','ok');
-}
 function closeModal(){
   if(dailySaving){toast('저장 확인 중입니다. 완료될 때까지 기다려 주세요','err');return;}
   document.getElementById('overlay').classList.remove('open');
