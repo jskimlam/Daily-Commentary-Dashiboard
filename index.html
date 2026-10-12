@@ -1210,7 +1210,8 @@ table{max-width:100%;}
     <div style="padding:15px 22px;background:#f9fafb;border-top:1px solid #eee;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;">
       <button class="btn btn-outline" onclick="restoreUnsavedEntry()" title="저장 오류 시 로컬 백업에서 입력값 복원">↺ 로컬 백업 복구</button>
       <button class="btn btn-outline" onclick="doParse()">🔍 파싱 실행</button>
-      <button class="btn btn-primary" onclick="doSaveAll()">▶ 전체 저장</button>
+      <span id="daily-save-state" role="status" aria-live="polite" style="display:none;flex:1;min-width:180px;font-size:13px;font-weight:700;color:#1d4ed8;"></span>
+      <button class="btn btn-primary" id="daily-save-button" onclick="doSaveAll()">▶ 전체 저장</button>
     </div>
   </div>
 </div>
