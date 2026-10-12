@@ -2619,7 +2619,12 @@ async function doSaveAll(){
   }
   if(count>0){
     toast('✅ '+count+'개 품목 저장 완료','ok');
-    if(!failed.length){closeModal();loadData();}
+    if(!failed.length){showDailySaveState('✅ '+count+'개 품목 저장 확인 완료','ok');loadData();}
+  }
+  } finally {
+    dailySaving=false;
+    clearInterval(elapsed);
+    if(saveButton){saveButton.disabled=false;saveButton.textContent='▶ 전체 저장';}
   }
 }
 async function delEntry(prod,date){
