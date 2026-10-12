@@ -2594,25 +2594,20 @@ async function doSaveAll(){
         document.getElementById('f-ou-'+p).value.trim(),
         document.getElementById('f-ad-'+p).value.trim(),
         document.getElementById('f-ai-'+p).value.trim()
-      ),
-      additionalInfo:document.getElementById('f-ad-'+p).value.trim(),
-      aiAnalysis:document.getElementById('f-ai-'+p).value.trim()
+      )
     };
     const action=isEdit?'edit':'save';
     const payload={sheet:p,data,rowKey:isEdit?{date:editMode.date}:null};
-    // Preserve a local recoverable copy even when the remote write fails.
-    try{localStorage.setItem('LAM_daily_unsaved_'+p,JSON.stringify({savedAt:new Date().toISOString(),action,payload}));}
-    catch(e){console.warn('Local backup unavailable',e);}
     try{
-      const r=await gasWrite({action,p:toB64(payload)});
-      if(r.success){count++;try{localStorage.removeItem('LAM_daily_unsaved_'+p);}catch(e){}}
-      else failed.push(p+': '+(r.message||r.error||'서버에서 저장 거절'));
+      const r=await saveBriefingToSheet(action,payload);
+      if(r.success)count++;
+      else failed.push(p+': '+(r.message||r.error||'서버 저장 미확인'));
     }catch(e){failed.push(p+': '+(e.message||String(e)));}
   }
   if(failed.length){
     console.warn('LAM Daily save not fully verified:',failed);
     const detail=failed.join(' / ').slice(0,280);
-    showDailySaveState('⚠️ 저장 결과 확인 필요 ('+failed.length+'건): '+detail+' · 로컬 백업은 유지됨','warn');
+    showDailySaveState('⚠️ 저장 결과 확인 필요 ('+failed.length+'건): '+detail+' · 저장 결과를 날짜별로 확인하세요','warn');
     showSt(activeTab,'warn','저장 확인 필요: '+failed[0].slice(0,120));
   }
   if(count>0){
