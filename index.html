@@ -2613,7 +2613,8 @@ async function requireDailyBackendV2(){
   dailyBackendV2Ready=true;
 }
 async function gasWrite(params){
-  await requireDailyBackendV2();
+  // A transient failure on a separate health request must not block a real save.
+  // The save action itself returns an explicit unsupported-version error if needed.
   if(typeof CompressionStream!=='function')return gasPost(params);
   const payload=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(params.p),c=>c.charCodeAt(0))));
   showDailySaveState('브리핑 압축 후 서버 전송 준비 중…');
