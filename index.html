@@ -2554,9 +2554,53 @@ async function gasPost(params){
   }
   return {success:false,unverified:true,message:'POST 요청 전송됨. 서버 저장 결과를 확인하지 못했으므로 날짜별 시트 확인 필요'};
 }
+function gasJsonp(params,timeoutMs=35000){
+  return new Promise((resolve,reject)=>{
+    const callback='__daily_cb_'+Date.now()+'_'+Math.random().toString(36).slice(2,12);
+    let finished=false;
+    const script=document.createElement('script');
+    const clear=()=>{
+      if(finished)return false;
+      finished=true;clearTimeout(timer);script.remove();delete window[callback];
+      return true;
+    };
+    window[callback]=(result)=>{if(clear())resolve(result);};
+    script.onerror=()=>{if(clear())reject(new Error('Apps Script 응답을 읽지 못함: 새 Code.gs 배포 또는 네트워크 확인 필요'));};
+    const query=new URLSearchParams({...params,callback,t:Date.now()});
+    const timer=setTimeout(()=>{if(clear())reject(new Error('Apps Script 응답 대기 시간 초과. 중복 저장 전에 시트 확인 필요'));},timeoutMs);
+    script.src=GAS+'?'+query.toString();
+    document.head.appendChild(script);
+  });
+}
+async function compressDailyPayload(base64){
+  const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));
+  const zipStream=new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+  const zipped=new Uint8Array(await new Response(zipStream).arrayBuffer());
+  let raw='';
+  for(let i=0;i<zipped.length;i+=8192)raw+=String.fromCharCode(...zipped.subarray(i,i+8192));
+  return btoa(raw);
+}
 async function gasWrite(params){
-  // All writes now use POST. Short GET save redirects sometimes fail in browsers.
-  return gasPost(params);
+  if(typeof CompressionStream!=='function')return gasPost(params);
+  const payload=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(params.p),c=>c.charCodeAt(0))));
+  showDailySaveState('브리핑 압축 후 서버 전송 준비 중…');
+  const compressed=await compressDailyPayload(params.p);
+  const action=params.action==='edit'?'editzip':'savezip';
+  const qs={action,z:compressed};
+  const full=GAS+'?'+new URLSearchParams({...qs,callback:'__daily_cb_'+Date.now()+'_1234567890'}).toString();
+  if(full.length>15000)return gasPost(params);
+  showDailySaveState('압축 전송 중 · 원본 '+params.p.length+'자 → 압축 '+compressed.length+'자…');
+  const reply=await gasJsonp(qs);
+  if(!reply?.success)return {success:false,message:reply?.message||'Apps Script 저장 거절'};
+  showDailySaveState('서버 저장 성공 · 저장 내용 확인 중…');
+  const check=await gasJsonp({action:'verify',sheet:payload.sheet,date:payload.data.date});
+  if(!check?.success||!check?.found)return {success:false,unverified:true,message:'저장 응답 수신, 검증 재조회 실패'};
+  const match=check.entry && Number(check.entry.price)===Number(payload.data.price) &&
+    String(check.entry.commentary||'')===String(payload.data.commentary||'') &&
+    String(check.entry.factors||'')===String(payload.data.factors||'') &&
+    String(check.entry.outlook||'')===String(payload.data.outlook||'');
+  if(!match)return {success:false,unverified:true,message:'저장 응답 수신, 원문 일치 확인 필요'};
+  return {success:true,verified:true};
 }
 let dailySaving=false;
 function showDailySaveState(message,kind){
