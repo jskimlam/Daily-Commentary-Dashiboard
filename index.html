@@ -2558,6 +2558,7 @@ function showDailySaveState(message,kind){
   if(!node)return;
   node.style.display='block';
   node.textContent=message;
+  node.dataset.stage=message;
   node.style.color=kind==='ok'?'#065F46':kind==='warn'?'#92400E':kind==='err'?'#B91C1C':'#1D4ED8';
 }
 async function doSaveAll(){
