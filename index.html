@@ -2552,7 +2552,27 @@ async function gasWrite(params){
   // All writes now use POST. Short GET save redirects sometimes fail in browsers.
   return gasPost(params);
 }
+let dailySaving=false;
+function showDailySaveState(message,kind){
+  const node=document.getElementById('daily-save-state');
+  if(!node)return;
+  node.style.display='block';
+  node.textContent=message;
+  node.style.color=kind==='ok'?'#065F46':kind==='warn'?'#92400E':kind==='err'?'#B91C1C':'#1D4ED8';
+}
 async function doSaveAll(){
+  if(dailySaving)return;
+  dailySaving=true;
+  const saveButton=document.getElementById('daily-save-button');
+  if(saveButton){saveButton.disabled=true;saveButton.textContent='⏳ 저장 진행 중…';}
+  const saveStarted=Date.now();
+  const elapsed=setInterval(()=>{
+    if(dailySaving) {
+      const node=document.getElementById('daily-save-state');
+      if(node && node.dataset.stage)showDailySaveState(node.dataset.stage+' · '+Math.floor((Date.now()-saveStarted)/1000)+'초 경과');
+    }
+  },1000);
+  try {
   let count=0,failed=[];
   const pending=[];
   for(const p of PRODS){
